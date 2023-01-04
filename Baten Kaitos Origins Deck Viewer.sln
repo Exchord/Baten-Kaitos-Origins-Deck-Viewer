@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.33027.164
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Baten Kaitos Origins Deck Viewer", "Baten Kaitos Origins Deck Viewer\Baten Kaitos Origins Deck Viewer.vbproj", "{556D1D19-7562-4B46-AAE4-A08DA3000780}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Baten Kaitos Origins Deck Viewer", "Baten Kaitos Origins Deck Viewer.vbproj", "{556D1D19-7562-4B46-AAE4-A08DA3000780}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,6 +20,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {CB255691-615F-4143-9D23-27CBD1C3BE11}
+		SolutionGuid = {D0C25F31-FA7C-427E-B464-81F8C833E2CE}
 	EndGlobalSection
 EndGlobal
