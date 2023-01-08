@@ -219,6 +219,8 @@
         Select Case e.KeyCode
             Case Keys.Escape, Keys.B
                 Close()
+            Case Keys.F1
+                Process.Start("https://github.com/Exchord/Baten-Kaitos-Origins-Deck-Viewer#contents")
         End Select
     End Sub
 End Class
