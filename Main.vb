@@ -13,6 +13,7 @@ Public Class Main
     Dim timer As Timer
     Dim context As ContextMenuStrip
     Dim panel As CustomPanel
+    Dim version As String
 
     Public ReadOnly default_color As Color = Color.FromArgb(&H90, &HFF, &HFF, &HFF)
     ReadOnly variable() As String = {"MP", "Enemy MP", "Partner MP", "EXP", "TP", "Gold"}
@@ -220,6 +221,18 @@ Public Class Main
         AddHandler Resize, AddressOf ResizePanel
         Show()
         panel.Focus()
+
+        version = FileVersionInfo.GetVersionInfo(Application.ExecutablePath).FileVersion
+        Dim i, count As Integer
+        For i = 0 To version.Length - 1
+            If version.ElementAt(i) = "." Then
+                count += 1
+            End If
+            If count = 2 Then
+                Exit For
+            End If
+        Next
+        version = version.Substring(0, i)
 
         timer = New Timer()
         With timer
@@ -538,7 +551,7 @@ Public Class Main
         If burst = 0 Then
             Dim MP As Double = ReadFloat(MP_address)
             battle_data(0).Text = "MP"
-            battle_data(6).Text = Decimals(MP)
+            battle_data(6).Text = Decimals(MP, False)
         Else
             Dim burst_timer As Integer = Read32(battle_address + &HA60)
             battle_data(0).Text = "MP burst"
@@ -673,12 +686,12 @@ Public Class Main
             Dim speed2 As Double = ReadFloat(speed_address + &H50)
             If Boost.Visible Then
                 Boost.address(0, y - 1, 0) = speed_address
-                Boost.table(0, y - 1, 0).Text = Decimals(speed1)
+                Boost.table(0, y - 1, 0).Text = Decimals(speed1, True)
                 Boost.address(0, y - 1, 1) = speed_address + &H50
-                Boost.table(0, y - 1, 1).Text = Decimals(speed2)
+                Boost.table(0, y - 1, 1).Text = Decimals(speed2, True)
             End If
             Dim state As Integer = Read16(base + 2)
-            '0 idle
+            '0 idle/waiting
             '2 done preparing turn
             '3 waiting in queue
             '4 acting
@@ -695,7 +708,9 @@ Public Class Main
             address(y, 2, 1) = base + 4
             Dim delay As Integer = Read32(base + &H1C)
             If delay = 0 Then
-                delay = Read32(base + 4)
+                If state < 4 Then
+                    delay = Read32(base + 4)
+                End If
                 If party = 0 AndAlso (delay < 0 Or delay > 140) Then
                     delay = 0
                 End If
@@ -705,7 +720,7 @@ Public Class Main
             Else
                 Dim speed As Double = Math.Round(10 * (speed_boost + armor_speed + aura_speed), MidpointRounding.AwayFromZero) / 10
                 If speed > 0 Then
-                    delay = Math.Floor(delay / speed)
+                    delay = Math.Ceiling(delay / speed)
                     If party > 0 And character <> 142 Then
                         delay += 590                        'enemies and partners always take 2 seconds to "select magnus"
                     End If
@@ -723,11 +738,7 @@ Public Class Main
             'crush
             address(y, 4, 0) = base + &H18
             Dim crush As Double = ReadFloat(base + &H18)
-            If crush = 0 Then
-                table(4, y).Text = ""
-            Else
-                table(4, y).Text = Decimals(crush)
-            End If
+            table(4, y).Text = Decimals(crush, True)
 
             'poison
             address(y, 5, 0) = base + &H1128
@@ -801,7 +812,7 @@ Public Class Main
                     address = base + (x - 1) * 4 + z * &H50
                     Boost.address(x, y, z) = address
                     value = ReadFloat(address)
-                    Boost.table(x, y, z).Text = Decimals(value)
+                    Boost.table(x, y, z).Text = Decimals(value, True)
                 Next
             Next
         Next
@@ -896,6 +907,8 @@ Public Class Main
         Dim source As Control = context.SourceControl
         If source Is Me Then
             context.Items.Add("Temporary boost")
+            context.Items.Add("Deck Viewer v" & version)
+            context.Items.Item(0).Font = New Font("Segoe UI", 9, FontStyle.Bold)
             Return
         End If
         Dim hex As String
@@ -962,11 +975,15 @@ Public Class Main
     End Sub
 
     Private Sub CopyAddress(sender As Object, e As ToolStripItemClickedEventArgs)
-        If e.ClickedItem.Text = "Temporary boost" Then
-            OpenBoost()
-        Else
-            Clipboard.SetText(e.ClickedItem.Text)
-        End If
+        Dim text As String = e.ClickedItem.Text
+        Select Case text
+            Case "Temporary boost"
+                OpenBoost()
+            Case "Deck Viewer v" & version
+                Process.Start("https://github.com/Exchord/Baten-Kaitos-Origins-Deck-Viewer#contents")
+            Case Else
+                Clipboard.SetText(e.ClickedItem.Text)
+        End Select
     End Sub
 
     Public Function FormatTime(input As Int64, min_length As Integer) As String
@@ -980,7 +997,7 @@ Public Class Main
         input = Math.Ceiling(input / 10) * 10       'round up to whole frames (1 second: 300; 1 frame: 10)
         Dim time As TimeSpan = TimeSpan.FromSeconds(Math.Round(input / 300, 2))
         If min_length = 0 And time.Minutes < 1 Then
-            Return Decimals(time.TotalSeconds)
+            Return FormatNumber(time.TotalSeconds, 2, TriState.True, TriState.False, TriState.False)
         End If
         Dim minutes As Integer = Math.Floor(time.TotalMinutes)
         Dim minutes_length As Integer = Math.Max(min_length, minutes.ToString.Length)
@@ -991,12 +1008,18 @@ Public Class Main
         Return minutes.ToString(format) & time.ToString("\:ss'.'ff")
     End Function
 
-    Public Function Decimals(value As Double) As String
-        If value = 0 Then
-            Return "0"
-        Else
-            Return FormatNumber(value, 2, TriState.True, TriState.False, TriState.False)
+    Public Function Decimals(value As Double, void As Boolean) As String
+        If value = 0 And void Then
+            Return ""
         End If
+        value = Math.Round(value, 2, MidpointRounding.AwayFromZero)
+        Dim pre_decimal_length, decimal_places As Integer
+        pre_decimal_length = value.ToString.IndexOf(".")
+        If pre_decimal_length <> -1 Then
+            decimal_places = value.ToString.Length - pre_decimal_length - 1
+        End If
+        decimal_places = Clamp(decimal_places, 0, 2)
+        Return FormatNumber(value, decimal_places, TriState.True, TriState.False, TriState.False)
     End Function
 
     Public Function Clamp(input As Double, min As Double, max As Double) As Double      'limit input number to a range
@@ -1052,9 +1075,12 @@ Public Class Main
     End Sub
 
     Private Sub Keyboard(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
-        If e.KeyCode = Keys.B Then
-            OpenBoost()
-        End If
+        Select Case e.KeyCode
+            Case Keys.B
+                OpenBoost()
+            Case Keys.F1
+                Process.Start("https://github.com/Exchord/Baten-Kaitos-Origins-Deck-Viewer#contents")
+        End Select
     End Sub
 
     Private Sub SaveWindowData() Handles Me.FormClosing
