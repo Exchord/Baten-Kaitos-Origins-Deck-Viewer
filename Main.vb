@@ -512,9 +512,9 @@ Public Class Main
             If id = 0 Then
                 Exit For
             End If
-            If x < 3 Then         'only the first 3 drops are added to the inventory
+            If x < 3 Then           'only the first 3 drops are added to the inventory
                 drop(x).Image = New Bitmap(magnus(id), New Size(30, 48))
-            Else
+            Else                    'the rest are only added to the field guide
                 drop(x).Image = ChangeOpacity(New Bitmap(magnus(id), New Size(30, 48)))
             End If
             drop(x).Show()
@@ -722,7 +722,7 @@ Public Class Main
                 If speed > 0 Then
                     delay = Math.Ceiling(delay / speed)
                     If party > 0 And character <> 142 Then
-                        delay += 590                        'enemies and partners always take 2 seconds to "select magnus"
+                        delay += 590                        'enemies and partners always take 1.97 seconds to "select magnus"
                     End If
                 Else
                     delay = Integer.MaxValue                'speed <= 0: permanently unable to act
@@ -743,9 +743,9 @@ Public Class Main
             'poison
             address(y, 5, 0) = base + &H1128
             address(y, 5, 1) = base + &H1134
-            Dim poison1 As Integer = Read32(base + &H1128)
+            Dim poison1 As Integer = Read32(base + &H1128)                      'poison timer
             If poison1 > 0 Then
-                Dim poison2 As Integer = Read32(base + &H1134)
+                Dim poison2 As Integer = Read32(base + &H1134)                  'poison damage timer
                 table(5, y).Text = FormatTime(poison1, 0) & " (" & FormatTime(poison2, 0) & ")"
             Else
                 table(5, y).Text = ""
@@ -757,33 +757,23 @@ Public Class Main
             address(y, 6, 2) = base + &H111C
             address(y, 6, 3) = base + &H1120
             address(y, 6, 4) = base + &H1124
-            Dim effect As Integer = Read32(base + &H1118)
-            If effect > 0 Then
-                'flames
-                Dim flames As Integer = Read32(base + &H1130)
-                table(6, y).Text = FormatTime(effect, 0) & " (" & FormatTime(flames, 0) & ")"
-            Else
-                'frozen
-                effect = Read32(base + &H111C)
+            Dim effect_offset() As Integer = {&H1118, &H111C, &H1120, &H1124}   'flames, frozen, shock, blind
+            Dim effect As Integer
+            For x = 0 To 3
+                effect = Read32(base + effect_offset(x))                        'effect timer
                 If effect > 0 Then
-                    table(6, y).Text = FormatTime(effect, 0)
-                Else
-                    'shock
-                    effect = Read32(base + &H1120)
-                    If effect > 0 Then
-                        table(6, y).Text = FormatTime(effect, 0)
+                    If x = 0 Then
+                        Dim flames As Integer = Read32(base + &H1130)           'flames damage timer
+                        table(6, y).Text = FormatTime(effect, 0) & " (" & FormatTime(flames, 0) & ")"
                     Else
-                        'blind
-                        effect = Read32(base + &H1124)
-                        If effect > 0 Then
-                            table(6, y).Text = FormatTime(effect, 0)
-                        Else
-                            table(6, y).Text = ""
-                        End If
+                        table(6, y).Text = FormatTime(effect, 0)
                     End If
+                    Exit For
                 End If
-            End If
-
+                If x = 3 Then               'no effect
+                    table(6, y).Text = ""
+                End If
+            Next
             For x = 0 To 7
                 table(x, y).Show()
             Next
@@ -980,7 +970,7 @@ Public Class Main
             Case "Temporary boost"
                 OpenBoost()
             Case "Deck Viewer v" & version
-                Process.Start("https://github.com/Exchord/Baten-Kaitos-Origins-Deck-Viewer#contents")
+                ViewDocumentation()
             Case Else
                 Clipboard.SetText(e.ClickedItem.Text)
         End Select
@@ -1074,12 +1064,16 @@ Public Class Main
         End If
     End Sub
 
+    Public Sub ViewDocumentation()
+        Process.Start("https://github.com/Exchord/Baten-Kaitos-Origins-Deck-Viewer#contents")
+    End Sub
+
     Private Sub Keyboard(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         Select Case e.KeyCode
             Case Keys.B
                 OpenBoost()
             Case Keys.F1
-                Process.Start("https://github.com/Exchord/Baten-Kaitos-Origins-Deck-Viewer#contents")
+                ViewDocumentation()
         End Select
     End Sub
 
