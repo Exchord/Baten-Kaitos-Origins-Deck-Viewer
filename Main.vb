@@ -731,12 +731,13 @@ Public Class Main
 
             'down
             address(y, 3, 0) = base + &H20
-            Dim down As Integer
-            If speed > 0 Then
-                down = Read32(base + &H20)
-                down = Math.Ceiling(down / speed)
-            ElseIf down > 0 Then
-                down = Integer.MaxValue
+            Dim down As Integer = Read32(base + &H20)
+            If down > 0 Then
+                If speed > 0 Then
+                    down = Math.Ceiling(down / speed)
+                Else
+                    down = Integer.MaxValue
+                End If
             End If
             table(3, y).Text = FormatTime(down, 0)
 
