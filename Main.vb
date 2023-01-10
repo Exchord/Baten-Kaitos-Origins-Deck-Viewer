@@ -691,16 +691,16 @@ Public Class Main
                 Boost.table(0, y - 1, 1).Text = Decimals(speed2, True)
             End If
             Dim state As Integer = Read16(base + 2)
-            '0 idle/waiting
+            '0 waiting for next turn
             '2 done preparing turn
             '3 waiting in queue
             '4 acting
             '5 leaving queue
-            Dim speed_boost As Double
+            Dim speed As Double
             If state = 3 Or state = 4 Then
-                speed_boost = speed2
+                speed = Math.Round(10 * (speed2 + armor_speed + aura_speed), MidpointRounding.AwayFromZero) / 10
             Else
-                speed_boost = speed1
+                speed = Math.Round(10 * (speed1 + armor_speed + aura_speed), MidpointRounding.AwayFromZero) / 10
             End If
 
             'delay
@@ -718,7 +718,6 @@ Public Class Main
                     delay = 0
                 End If
             Else
-                Dim speed As Double = Math.Round(10 * (speed_boost + armor_speed + aura_speed), MidpointRounding.AwayFromZero) / 10
                 If speed > 0 Then
                     delay = Math.Ceiling(delay / speed)
                     If party > 0 And character <> 142 Then
@@ -732,7 +731,13 @@ Public Class Main
 
             'down
             address(y, 3, 0) = base + &H20
-            Dim down As Integer = Read32(base + &H20)
+            Dim down As Integer
+            If speed > 0 Then
+                down = Read32(base + &H20)
+                down = Math.Ceiling(down / speed)
+            ElseIf down > 0 Then
+                down = Integer.MaxValue
+            End If
             table(3, y).Text = FormatTime(down, 0)
 
             'crush
