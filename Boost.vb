@@ -40,60 +40,61 @@
         panel.Size = New Size(Width - 16, Height - 16)
         Controls.Add(panel)
 
-        For y = 0 To 2
-            For x = 0 To 17
-                legend(y, x) = New Label()
-                With legend(y, x)
-                    Select Case y
-                        Case 0
-                            If x >= 5 Then
-                                Continue For
-                            End If
-                            If x < 2 Then
-                                .Size = New Size(column_width(x), 49)
-                            Else
-                                .Size = New Size(column_width(x), 24)
-                            End If
-                            If x = 0 Then
-                                .Location = New Point(20, 20)
-                            Else
-                                .Location = New Point(legend(0, x - 1).Left + legend(0, x - 1).Width + 1, 20)
-                            End If
-                            .BackColor = Main.default_color
-                            .Font = New Font("Segoe UI", 9, FontStyle.Bold)
-                            .Text = column_name(x)
-                        Case 1
-                            .Size = New Size(cell_width, 24)
-                            If x = 0 Then
-                                .Location = New Point(legend(0, 1).Left + legend(0, 1).Width + 1, 45)
-                            Else
-                                .Location = New Point(legend(1, x - 1).Left + legend(1, x - 1).Width + 1, 45)
-                            End If
-                            .Font = New Font("Segoe UI", 9, FontStyle.Bold)
-                            If x < 12 Then
-                                .Text = element_name(x Mod 6)
-                                .BackColor = element_color(x Mod 6)
-                            Else
-                                .Text = resistance(x Mod 6)
-                                If x < 16 Then
-                                    .BackColor = Main.status_color(x Mod 6)
-                                Else
-                                    .BackColor = Main.default_color
-                                End If
-                            End If
-                        Case 2
-                            .Hide()
-                            If x >= 9 Then
-                                Continue For
-                            End If
-                            .BackColor = Main.default_color
-                            .Size = New Size(column_width(0), 49)
-                            .Location = New Point(20, 70 + x * 50)
-                    End Select
-                    .TextAlign = ContentAlignment.MiddleCenter
-                End With
-                panel.Controls.Add(legend(y, x))
-            Next
+        For x = 0 To 4
+            legend(0, x) = New Label()
+            With legend(0, x)
+                If x < 2 Then
+                    .Size = New Size(column_width(x), 49)
+                Else
+                    .Size = New Size(column_width(x), 24)
+                End If
+                If x = 0 Then
+                    .Location = New Point(20, 20)
+                Else
+                    .Location = New Point(legend(0, x - 1).Left + legend(0, x - 1).Width + 1, 20)
+                End If
+                .BackColor = Main.default_color
+                .TextAlign = ContentAlignment.MiddleCenter
+                .Font = New Font("Segoe UI", 9, FontStyle.Bold)
+                .Text = column_name(x)
+            End With
+            panel.Controls.Add(legend(0, x))
+        Next
+        For x = 0 To 17
+            legend(1, x) = New Label()
+            With legend(1, x)
+                .Size = New Size(cell_width, 24)
+                If x = 0 Then
+                    .Location = New Point(legend(0, 1).Left + legend(0, 1).Width + 1, 45)
+                Else
+                    .Location = New Point(legend(1, x - 1).Left + legend(1, x - 1).Width + 1, 45)
+                End If
+                .TextAlign = ContentAlignment.MiddleCenter
+                .Font = New Font("Segoe UI", 9, FontStyle.Bold)
+                If x < 12 Then
+                    .Text = element_name(x Mod 6)
+                    .BackColor = element_color(x Mod 6)
+                Else
+                    .Text = resistance(x Mod 6)
+                    If x < 16 Then
+                        .BackColor = Main.status_color(x Mod 6)
+                    Else
+                        .BackColor = Main.default_color
+                    End If
+                End If
+            End With
+            panel.Controls.Add(legend(1, x))
+        Next
+        For x = 0 To 8
+            legend(2, x) = New Label()
+            With legend(2, x)
+                .Hide()
+                .BackColor = Main.default_color
+                .Size = New Size(column_width(0), 49)
+                .Location = New Point(20, 70 + x * 50)
+                .TextAlign = ContentAlignment.MiddleCenter
+            End With
+            panel.Controls.Add(legend(2, x))
         Next
 
         For x = 0 To 18
@@ -177,33 +178,23 @@
             Return
         End If
         scroll_pos = panel.AutoScrollPosition
-        For y = 0 To 2
-            For x = 0 To 17
-                Select Case y
-                    Case 0
-                        If x >= 5 Then
-                            Continue For
-                        End If
-                        If x = 0 Then
-                            legend(y, x).Location = New Point(20 + scroll_pos.X, 20 + scroll_pos.Y)
-                        Else
-                            legend(y, x).Location = New Point(legend(0, x - 1).Left + legend(0, x - 1).Width + 1, 20 + scroll_pos.Y)
-                        End If
-                    Case 1
-                        If x = 0 Then
-                            legend(y, x).Location = New Point(legend(0, 1).Left + legend(0, 1).Width + 1, 45 + scroll_pos.Y)
-                        Else
-                            legend(y, x).Location = New Point(legend(1, x - 1).Left + legend(1, x - 1).Width + 1, 45 + scroll_pos.Y)
-                        End If
-                    Case 2
-                        If x > rows Then
-                            Continue For
-                        End If
-                        legend(y, x).Location = New Point(20 + scroll_pos.X, 70 + x * 50 + scroll_pos.Y)
-                End Select
-            Next
+        For x = 0 To 4
+            If x = 0 Then
+                legend(0, x).Location = New Point(20 + scroll_pos.X, 20 + scroll_pos.Y)
+            Else
+                legend(0, x).Location = New Point(legend(0, x - 1).Left + legend(0, x - 1).Width + 1, 20 + scroll_pos.Y)
+            End If
         Next
-
+        For x = 0 To 17
+            If x = 0 Then
+                legend(1, x).Location = New Point(legend(0, 1).Left + legend(0, 1).Width + 1, 45 + scroll_pos.Y)
+            Else
+                legend(1, x).Location = New Point(legend(1, x - 1).Left + legend(1, x - 1).Width + 1, 45 + scroll_pos.Y)
+            End If
+        Next
+        For x = 0 To rows
+            legend(2, x).Location = New Point(20 + scroll_pos.X, 70 + x * 50 + scroll_pos.Y)
+        Next
         For x = 0 To 18
             For y = 0 To 8
                 For z = 0 To 1
@@ -211,7 +202,6 @@
                 Next
             Next
         Next
-
         dummy.Location = New Point(table(18, rows - 1, 1).Left + cell_width + 19, table(18, rows - 1, 1).Top + 43)
     End Sub
 

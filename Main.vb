@@ -647,24 +647,24 @@ Public Class Main
 
             'equipment
             Dim armor_speed As Double = 0
+            Dim equip_pointer As Int64
             If party = 0 Then
-                Dim equip_pointer As Int64
                 equip_pointer = Read32(addr - &H1244)
-                If equip_pointer <> 0 Then
-                    Dim magnus_address As Int64 = equip_pointer + &H17FFF0000 - dolphin_offset_2
-                    Dim magnus_effect As Integer
-                    For x = 0 To 2
-                        magnus_effect = Read16(magnus_address + 66 + x * 8)
-                        Select Case magnus_effect
-                            Case 55     'increases turnover speed
-                                armor_speed = 0.01 * Read16(magnus_address + 70 + x * 8)
-                                Exit For
-                            Case 61     'decreases turnover speed
-                                armor_speed = -0.01 * Read16(magnus_address + 70 + x * 8)
-                                Exit For
-                        End Select
-                    Next
-                End If
+            End If
+            If equip_pointer <> 0 Then
+                Dim magnus_address As Int64 = equip_pointer + &H17FFF0000 - dolphin_offset_2
+                Dim magnus_effect As Integer
+                For x = 0 To 2
+                    magnus_effect = Read16(magnus_address + 66 + x * 8)
+                    Select Case magnus_effect
+                        Case 55     'increases turnover speed
+                            armor_speed = 0.01 * Read16(magnus_address + 70 + x * 8)
+                            Exit For
+                        Case 61     'decreases turnover speed
+                            armor_speed = -0.01 * Read16(magnus_address + 70 + x * 8)
+                            Exit For
+                    End Select
+                Next
             End If
 
             'aura
@@ -770,10 +770,11 @@ Public Class Main
                     End If
                     Exit For
                 End If
-                If x = 3 Then               'no effect
-                    table(6, y).Text = ""
-                End If
             Next
+            If effect = 0 Then
+                table(6, y).Text = ""
+            End If
+
             For x = 0 To 7
                 table(x, y).Show()
             Next
