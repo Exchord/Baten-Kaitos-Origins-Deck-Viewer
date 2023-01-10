@@ -696,6 +696,7 @@ Public Class Main
             '3 waiting in queue
             '4 acting
             '5 leaving queue
+            '7 down, waiting to get back into queue
             Dim speed As Double
             If state = 3 Or state = 4 Then
                 speed = Math.Round(10 * (speed2 + armor_speed + aura_speed), MidpointRounding.AwayFromZero) / 10
@@ -708,10 +709,10 @@ Public Class Main
             address(y, 2, 1) = base + 4
             Dim delay As Integer = Read32(base + &H1C)
             If delay = 0 Then
-                If state < 4 Then
+                If state < 4 Or state = 7 Then
                     delay = Read32(base + 4)
                 End If
-                If party = 0 AndAlso (delay < 0 Or delay > 140) Then
+                If party = 0 And state < 3 AndAlso (delay < 0 Or delay > 140) Then
                     delay = 0
                 End If
                 If delay = 4194444 Then
