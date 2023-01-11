@@ -5,7 +5,7 @@ Public Class Main
     Dim magnus(486) As Bitmap
     Dim card(60), magnus_cursor, drop(8) As PictureBox
     Dim table(8, 10), error_message, battle_data(12), time_label, battle, next_card, dummy As Label
-    Dim battle_check, id(60), card_buffer(60), next_(60), hand_size, deck_size, shuffle, cursor_pos, first_card, next_draw, first_out, slot, members, partners, enemies, order(60), battle_id, magnus_size As Integer
+    Dim battle_check, id(60), card_buffer(60), next_(60), hand_size, deck_size, shuffle, cursor_pos, first_card, next_draw, first_out, slot, members, partners, enemies, order(60), battle_id, magnus_size, status_effect(9) As Integer
     Dim game, pointer_address, offset, time_address, MP_address, partner_address, pointer, battle_time, enemy_lookup, magnus_lookup, dolphin_offset_1, dolphin_offset_2, battle_address, emu_battle_address, address(9, 8, 5), card_address(60) As Int64
     Dim hooked, empty, opacity_buffer(60) As Boolean
     Dim hProcess As IntPtr
@@ -668,14 +668,14 @@ Public Class Main
             End If
 
             'aura
-            Dim aura_speed As Double = 1
+            Dim char_speed As Double = 1
             If party = 0 AndAlso Read32(base + &H1214) <> 0 Then
                 Dim aura_timer As Integer
                 address(y, 7, 0) = base + &H1360
                 aura_timer = Read32(base + &H1360)
                 table(7, y).Text = FormatTime(aura_timer, 0)
                 table(7, y).ContextMenuStrip = context
-                aura_speed = ReadFloat(addr + 252)
+                char_speed = ReadFloat(addr + &HFC)
             Else
                 table(7, y).Text = ""
                 table(7, y).ContextMenuStrip = Nothing
@@ -697,12 +697,13 @@ Public Class Main
             '4 acting
             '5 leaving queue
             '7 down, waiting to get back into queue
-            Dim speed As Double
+            Dim speed_boost As Double
             If state = 3 Or state = 4 Then
-                speed = Math.Round(10 * (speed2 + armor_speed + aura_speed), MidpointRounding.AwayFromZero) / 10
+                speed_boost = speed1
             Else
-                speed = Math.Round(10 * (speed1 + armor_speed + aura_speed), MidpointRounding.AwayFromZero) / 10
+                speed_boost = speed2
             End If
+            Dim speed As Double = 0.1 * Math.Round(10 * (char_speed + speed_boost + armor_speed), MidpointRounding.AwayFromZero)
 
             'delay
             address(y, 2, 0) = base + &H1C
@@ -775,11 +776,13 @@ Public Class Main
                     Else
                         table(6, y).Text = FormatTime(effect, 0)
                     End If
+                    status_effect(y - 1) = x + 1
                     Exit For
                 End If
             Next
             If effect = 0 Then
                 table(6, y).Text = ""
+                status_effect(y - 1) = 0
             End If
 
             For x = 0 To 7
@@ -901,75 +904,87 @@ Public Class Main
     End Sub
 
     Private Sub OpenContextMenu()
-        context.Items.Clear()
-        Dim source As Control = context.SourceControl
-        If source Is Me Then
-            context.Items.Add("Temporary boost")
-            context.Items.Add("Deck Viewer v" & version)
-            context.Items.Item(0).Font = New Font("Segoe UI", 9, FontStyle.Bold)
-            Return
-        End If
-        Dim hex As String
-
-        'battle id
-        If source Is battle Then
-            hex = Conversion.Hex(time_address - &HA8)
-            context.Items.Add(hex)
-            Return
-        End If
-
-        'time
-        If source Is time_label Then
-            hex = Conversion.Hex(time_address)
-            context.Items.Add(hex)
-            Return
-        End If
-
-        Dim x As Integer = source.Tag
-        If TypeOf source Is PictureBox Then
-            'drop
-            If drop.Contains(source) Then
-                hex = Conversion.Hex(time_address + &H44 + x * 4)
-                context.Items.Add(hex)
+        With context.Items
+            .Clear()
+            Dim source As Control = context.SourceControl
+            If source Is Me Then
+                .Add("Temporary boost")
+                .Add("Deck Viewer v" & version)
+                .Item(0).Font = New Font("Segoe UI", 9, FontStyle.Bold)
                 Return
             End If
-            'deck
-            hex = Conversion.Hex(card_address(x))
-            context.Items.Add(hex)
-            hex = Conversion.Hex(magnus_lookup + id(order(x)) * magnus_size)
-            context.Items.Add(hex)
-            Return
-        End If
+            Dim hex As String
 
-        'MP & results
-        If battle_data.Contains(source) Then
-            Dim address() As Int64 = {MP_address, MP_address + &H1C4, MP_address + &H1C0, time_address + &H34, time_address + &H38, time_address + &H3C}
-            hex = Conversion.Hex(address(x))
-            context.Items.Add(hex)
-            If x = 0 And battle_data(0).Text = "MP burst" Then
-                hex = Conversion.Hex(battle_address + &HA60)
-                context.Items.Add(hex)
+            'battle id
+            If source Is battle Then
+                hex = Conversion.Hex(time_address - &HA8)
+                .Add(hex)
+                Return
             End If
-            Return
-        End If
 
-        'table
-        Dim y As Integer = source.Name
-        For z = 0 To 4
-            hex = Conversion.Hex(address(y, x, z))
-            If hex = "0" Then
-                Exit For
+            'time
+            If source Is time_label Then
+                hex = Conversion.Hex(time_address)
+                .Add(hex)
+                Return
             End If
-            context.Items.Add(hex)
-        Next
 
-        'effect colors
-        If x = 6 Then
-            context.Items.Item(0).ForeColor = status_color(0)
-            For i = 1 To 4
-                context.Items.Item(i).ForeColor = status_color(i - 1)
+            Dim x As Integer = source.Tag
+            If TypeOf source Is PictureBox Then
+                'drop
+                If drop.Contains(source) Then
+                    hex = Conversion.Hex(time_address + &H44 + x * 4)
+                    .Add(hex)
+                    Return
+                End If
+                'deck
+                hex = Conversion.Hex(card_address(x))
+                .Add(hex)
+                hex = Conversion.Hex(magnus_lookup + id(order(x)) * magnus_size)
+                .Add(hex)
+                Return
+            End If
+
+            'MP & results
+            If battle_data.Contains(source) Then
+                Dim address() As Int64 = {MP_address, MP_address + &H1C4, MP_address + &H1C0, time_address + &H34, time_address + &H38, time_address + &H3C}
+                hex = Conversion.Hex(address(x))
+                .Add(hex)
+                If x = 0 And battle_data(0).Text = "MP burst" Then
+                    hex = Conversion.Hex(battle_address + &HA60)
+                    .Add(hex)
+                End If
+                Return
+            End If
+
+            'table
+            Dim y As Integer = source.Name
+            For z = 0 To 4
+                hex = Conversion.Hex(address(y, x, z))
+                If hex = "0" Then
+                    Exit For
+                End If
+                .Add(hex)
             Next
-        End If
+
+            'effect colors
+            If x <> 6 Then
+                Return
+            End If
+            .Item(0).ForeColor = status_color(0)
+            For i = 1 To 4
+                .Item(i).ForeColor = status_color(i - 1)
+            Next
+
+            'highlight effect
+            Dim effect As Integer = status_effect(y - 1)
+            If effect = 1 Then
+                .Item(0).Font = New Font("Segoe UI", 9, FontStyle.Bold)
+                .Item(1).Font = New Font("Segoe UI", 9, FontStyle.Bold)
+            ElseIf effect > 1 Then
+                .Item(effect).Font = New Font("Segoe UI", 9, FontStyle.Bold)
+            End If
+        End With
     End Sub
 
     Private Sub CopyAddress(sender As Object, e As ToolStripItemClickedEventArgs)
