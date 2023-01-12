@@ -796,7 +796,6 @@ Public Class Main
         Dim value As Double
         Dim characters As Integer = members + partners + enemies
         Dim address As Int64
-        Boost.UpdateRows(characters)
         For y = 0 To characters - 1
             Boost.legend(2, y).Text = table(0, y + 1).Text      'names
             Dim base As Int64
@@ -818,6 +817,7 @@ Public Class Main
             Next
         Next
 
+        Boost.UpdateRows(characters)
         For y = 0 To characters - 1
             Boost.legend(2, y).Show()
             For x = 0 To 18
@@ -832,7 +832,8 @@ Public Class Main
                 Boost.table(x, y, 1).Hide()
             Next
         Next
-        Boost.dummy.Location = New Point(Boost.table(18, characters - 1, 1).Left + Boost.cell_width + 19, Boost.table(18, characters - 1, 1).Top + 43)
+        Boost.dummy.Left = Boost.table(18, characters - 1, 1).Left + 78
+        Boost.dummy.Top = Boost.table(18, characters - 1, 1).Top + 43
     End Sub
 
     Private Sub Clear()
@@ -913,19 +914,16 @@ Public Class Main
                 .Item(0).Font = New Font("Segoe UI", 9, FontStyle.Bold)
                 Return
             End If
-            Dim hex As String
 
             'battle id
             If source Is battle Then
-                hex = Conversion.Hex(time_address - &HA8)
-                .Add(hex)
+                .Add(Hex(time_address - &HA8))
                 Return
             End If
 
             'time
             If source Is time_label Then
-                hex = Conversion.Hex(time_address)
-                .Add(hex)
+                .Add(Hex(time_address))
                 Return
             End If
 
@@ -933,26 +931,21 @@ Public Class Main
             If TypeOf source Is PictureBox Then
                 'drop
                 If drop.Contains(source) Then
-                    hex = Conversion.Hex(time_address + &H44 + x * 4)
-                    .Add(hex)
+                    .Add(Hex(time_address + &H44 + x * 4))
                     Return
                 End If
                 'deck
-                hex = Conversion.Hex(card_address(x))
-                .Add(hex)
-                hex = Conversion.Hex(magnus_lookup + id(order(x)) * magnus_size)
-                .Add(hex)
+                .Add(Hex(card_address(x)))
+                .Add(Hex(magnus_lookup + id(order(x)) * magnus_size))
                 Return
             End If
 
             'MP & results
             If battle_data.Contains(source) Then
                 Dim address() As Int64 = {MP_address, MP_address + &H1C4, MP_address + &H1C0, time_address + &H34, time_address + &H38, time_address + &H3C}
-                hex = Conversion.Hex(address(x))
-                .Add(hex)
+                .Add(Hex(address(x)))
                 If x = 0 And battle_data(0).Text = "MP burst" Then
-                    hex = Conversion.Hex(battle_address + &HA60)
-                    .Add(hex)
+                    .Add(Hex(battle_address + &HA60))
                 End If
                 Return
             End If
@@ -960,11 +953,10 @@ Public Class Main
             'table
             Dim y As Integer = source.Name
             For z = 0 To 4
-                hex = Conversion.Hex(address(y, x, z))
-                If hex = "0" Then
+                If address(y, x, z) = 0 Then
                     Exit For
                 End If
-                .Add(hex)
+                .Add(Hex(address(y, x, z)))
             Next
 
             'effect colors

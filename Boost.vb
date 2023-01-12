@@ -7,9 +7,7 @@
     Dim panel As CustomPanel
     Dim scroll_pos As Point
 
-    Public ReadOnly cell_width = 59
     ReadOnly column_name() As String = {"Character", "Speed", "Offense", "Defense", "Resistance"}
-    ReadOnly column_width() As Integer = {169, cell_width, 359, 359, 359}
     ReadOnly element_name() As String = {"Physical", "Fire", "Ice", "Lightning", "Light", "Darkness"}
     ReadOnly resistance() As String = {"Flames", "Freezing", "Shock", "Blindness", "Poison", "Sleep"}
     ReadOnly element_color() As Color = {Color.FromArgb(&H90, &HA8, &H5A, &H2A), Color.FromArgb(&H90, &HFF, &H20, &H0), Color.FromArgb(&H90, &H0, &HB0, &HFF), Color.FromArgb(&H90, &H0, &HB0, &H0), Color.FromArgb(&H90, &HC0, &HC0, &HC0), Color.FromArgb(&H90, &HC0, &H0, &HFF)}
@@ -43,16 +41,17 @@
         For x = 0 To 4
             legend(0, x) = New Label()
             With legend(0, x)
-                If x < 2 Then
-                    .Size = New Size(column_width(x), 49)
-                Else
-                    .Size = New Size(column_width(x), 24)
-                End If
-                If x = 0 Then
-                    .Location = New Point(20, 20)
-                Else
-                    .Location = New Point(legend(0, x - 1).Left + legend(0, x - 1).Width + 1, 20)
-                End If
+                Select Case x
+                    Case 0
+                        .Size = New Size(169, 49)
+                        .Location = New Point(20, 20)
+                    Case 1
+                        .Size = New Size(59, 49)
+                        .Location = New Point(190, 20)
+                    Case Else
+                        .Size = New Size(359, 24)
+                        .Location = New Point(x * 360 - 470, 20)
+                End Select
                 .BackColor = Main.default_color
                 .TextAlign = ContentAlignment.MiddleCenter
                 .Font = New Font("Segoe UI", 9, FontStyle.Bold)
@@ -63,11 +62,11 @@
         For x = 0 To 17
             legend(1, x) = New Label()
             With legend(1, x)
-                .Size = New Size(cell_width, 24)
+                .Size = New Size(59, 24)
                 If x = 0 Then
-                    .Location = New Point(legend(0, 1).Left + legend(0, 1).Width + 1, 45)
+                    .Location = New Point(250, 45)
                 Else
-                    .Location = New Point(legend(1, x - 1).Left + legend(1, x - 1).Width + 1, 45)
+                    .Location = New Point(250 + x * 60, 45)
                 End If
                 .TextAlign = ContentAlignment.MiddleCenter
                 .Font = New Font("Segoe UI", 9, FontStyle.Bold)
@@ -90,7 +89,7 @@
             With legend(2, x)
                 .Hide()
                 .BackColor = Main.default_color
-                .Size = New Size(column_width(0), 49)
+                .Size = New Size(169, 49)
                 .Location = New Point(20, 70 + x * 50)
                 .TextAlign = ContentAlignment.MiddleCenter
             End With
@@ -103,8 +102,8 @@
                     table(x, y, z) = New Label()
                     With table(x, y, z)
                         .Hide()
-                        .Size = New Size(cell_width, 24)
-                        .Location = New Point(190 + x * (cell_width + 1), 70 + y * 50 + z * 25)
+                        .Size = New Size(59, 24)
+                        .Location = New Point(190 + x * 60, 70 + y * 50 + z * 25)
                         .TextAlign = ContentAlignment.MiddleCenter
                         If z = 0 Then
                             .BackColor = Main.default_color
@@ -122,7 +121,7 @@
         dummy = New Label()
         With dummy
             .Size = New Size(0, 0)
-            .Location = New Point(table(18, 8, 1).Left + cell_width + 19, table(18, 8, 1).Top + 43)
+            .Location = New Point(1348, 188)
         End With
         panel.Controls.Add(dummy)
 
@@ -179,30 +178,32 @@
         End If
         scroll_pos = panel.AutoScrollPosition
         For x = 0 To 4
-            If x = 0 Then
-                legend(0, x).Location = New Point(20 + scroll_pos.X, 20 + scroll_pos.Y)
-            Else
-                legend(0, x).Location = New Point(legend(0, x - 1).Left + legend(0, x - 1).Width + 1, 20 + scroll_pos.Y)
-            End If
+            Select Case x
+                Case 0
+                    legend(0, x).Location = New Point(20, 20) + scroll_pos
+                Case 1
+                    legend(0, x).Location = New Point(190, 20) + scroll_pos
+                Case Else
+                    legend(0, x).Location = New Point(x * 360 - 470, 20) + scroll_pos
+            End Select
         Next
         For x = 0 To 17
             If x = 0 Then
-                legend(1, x).Location = New Point(legend(0, 1).Left + legend(0, 1).Width + 1, 45 + scroll_pos.Y)
+                legend(1, x).Location = New Point(250, 45) + scroll_pos
             Else
-                legend(1, x).Location = New Point(legend(1, x - 1).Left + legend(1, x - 1).Width + 1, 45 + scroll_pos.Y)
+                legend(1, x).Location = New Point(250 + x * 60, 45) + scroll_pos
             End If
         Next
         For x = 0 To rows
-            legend(2, x).Location = New Point(20 + scroll_pos.X, 70 + x * 50 + scroll_pos.Y)
+            legend(2, x).Location = New Point(20, 70 + x * 50) + scroll_pos
         Next
         For x = 0 To 18
             For y = 0 To 8
                 For z = 0 To 1
-                    table(x, y, z).Location = New Point(190 + x * (cell_width + 1) + scroll_pos.X, 70 + y * 50 + z * 25 + scroll_pos.Y)
+                    table(x, y, z).Location = New Point(190 + x * 60, 70 + y * 50 + z * 25) + scroll_pos
                 Next
             Next
         Next
-        dummy.Location = New Point(table(18, rows - 1, 1).Left + cell_width + 19, table(18, rows - 1, 1).Top + 43)
     End Sub
 
     Private Sub Keyboard(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
