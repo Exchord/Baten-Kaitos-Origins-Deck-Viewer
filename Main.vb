@@ -39,7 +39,9 @@ Public Class Main
     ReadOnly interrupted_battles() As Integer = {5, 29, 30, 42, 43, 62, 74, 93, 103, 108, 149, 151, 147, 135, 145, 252}
     ReadOnly HP_limit() As Integer = {1140 - 571, 2800 - 1401, 1760 - 177, 4560 - 2281, 4270 - 2136, 4000 - 201, 5280 - 397, 5080 - 509, 10320 - 4129, 8220 - 412, 6680 - 335, 9910 - 744, 11280 - 1129, 10690 - 1070, 13140 - 1315, 4270 - 2136}
     'Hideous Beast, Hideous Beast 2, Machina Arma: Razer, Umbra, Lord of the Lava Caves, Machina Arma: Marauder, Promachina Heughes, Machina Arma: Razer 2, Guillo, Promachina Shanath, Machina Arma: Marauder 2, Promachina Heughes 2, Machina Arma: Razer 3, Baelheit, Verus-Wiseman
-    Public ReadOnly status_color() As Color = {Color.FromArgb(&H90, &HFF, &H20, &H0), Color.FromArgb(&H90, &H0, &HB0, &HFF), Color.FromArgb(&H90, &H0, &HB0, &H0), Color.FromArgb(&H90, &HC0, &H0, &HFF)}
+
+    Public ReadOnly element_color() As Color = {Color.FromArgb(&H90, &HA8, &H5A, &H2A), Color.FromArgb(&H90, &HFF, &H20, &H0), Color.FromArgb(&H90, &H0, &HB0, &HFF), Color.FromArgb(&H90, &H0, &HB0, &H0), Color.FromArgb(&H90, &HC0, &HC0, &HC0), Color.FromArgb(&H90, &HC0, &H0, &HFF)}
+    Public ReadOnly status_color() As Color = {element_color(1), element_color(2), element_color(3), element_color(5)}
 
     Private Declare Function OpenProcess Lib "kernel32" (dwDesiredAccess As Integer, bInheritHandle As Integer, dwProcessId As Integer) As Integer
     Private Declare Function ReadProcessMemory Lib "kernel32" Alias "ReadProcessMemory" (hProcess As Integer, lpBaseAddress As Int64, ByRef lpBuffer As Integer, nSize As Integer, ByRef lpNumberOfBytesWritten As Integer) As Integer
@@ -832,7 +834,6 @@ Public Class Main
                 Boost.table(x, y, 1).Hide()
             Next
         Next
-        Boost.dummy.Left = Boost.table(18, characters - 1, 1).Left + 78
         Boost.dummy.Top = Boost.table(18, characters - 1, 1).Top + 43
     End Sub
 

@@ -10,7 +10,6 @@
     ReadOnly column_name() As String = {"Character", "Speed", "Offense", "Defense", "Resistance"}
     ReadOnly element_name() As String = {"Physical", "Fire", "Ice", "Lightning", "Light", "Darkness"}
     ReadOnly resistance() As String = {"Flames", "Freezing", "Shock", "Blindness", "Poison", "Sleep"}
-    ReadOnly element_color() As Color = {Color.FromArgb(&H90, &HA8, &H5A, &H2A), Color.FromArgb(&H90, &HFF, &H20, &H0), Color.FromArgb(&H90, &H0, &HB0, &HFF), Color.FromArgb(&H90, &H0, &HB0, &H0), Color.FromArgb(&H90, &HC0, &HC0, &HC0), Color.FromArgb(&H90, &HC0, &H0, &HFF)}
     ReadOnly secondary_color As Color = Color.FromArgb(&H70, &HFF, &HFF, &HFF)
 
     Private Sub Open() Handles MyBase.Load
@@ -72,7 +71,7 @@
                 .Font = New Font("Segoe UI", 9, FontStyle.Bold)
                 If x < 12 Then
                     .Text = element_name(x Mod 6)
-                    .BackColor = element_color(x Mod 6)
+                    .BackColor = Main.element_color(x Mod 6)
                 Else
                     .Text = resistance(x Mod 6)
                     If x < 16 Then
@@ -121,7 +120,7 @@
         dummy = New Label()
         With dummy
             .Size = New Size(0, 0)
-            .Location = New Point(1348, 188)
+            .Location = New Point(1348, 0)
         End With
         panel.Controls.Add(dummy)
 
