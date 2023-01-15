@@ -153,7 +153,11 @@
         x = Asc(str.ElementAt(0))
         y = "&H" & str.ElementAt(1)
         z = "&H" & str.ElementAt(2)
-        context.Items.Add(Hex(Main.dolphin + address(x, y, z)))
+        Dim dolphin As Integer
+        If My.Settings.ApplyOffset Then
+            dolphin = Main.dolphin
+        End If
+        context.Items.Add(Hex(dolphin + address(x, y, z)))
     End Sub
 
     Private Sub CopyAddress(sender As Object, e As ToolStripItemClickedEventArgs)

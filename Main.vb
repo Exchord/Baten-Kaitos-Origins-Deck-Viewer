@@ -43,6 +43,7 @@ Public Class Main
 
     Public ReadOnly element_color() As Color = {Color.FromArgb(&H90, &HA8, &H5A, &H2A), Color.FromArgb(&H90, &HFF, &H20, &H0), Color.FromArgb(&H90, &H0, &HB0, &HFF), Color.FromArgb(&H90, &H0, &HB0, &H0), Color.FromArgb(&H90, &HC0, &HC0, &HC0), Color.FromArgb(&H90, &HC0, &H0, &HFF)}
     Public ReadOnly status_color() As Color = {element_color(1), element_color(2), element_color(3), element_color(5)}
+    ReadOnly dolphin_version() As String = {"Dolphin 4.0", "Dolphin 4.0.1", "Dolphin 4.0.2", "Dolphin 5.0"}
 
     Private Declare Function OpenProcess Lib "kernel32" (dwDesiredAccess As Integer, bInheritHandle As Integer, dwProcessId As Integer) As Integer
     Private Declare Function ReadProcessMemory Lib "kernel32" Alias "ReadProcessMemory" (hProcess As Integer, lpBaseAddress As Int64, ByRef lpBuffer As Integer, nSize As Integer, ByRef lpNumberOfBytesWritten As Integer) As Integer
@@ -282,14 +283,22 @@ Public Class Main
             End If
             If Not hooked Then
                 Dim title As String = emulator(0).MainWindowTitle
-                If title = "Dolphin 4.0.2" OrElse title.StartsWith("Dolphin 4.0.2 |") Then
-                    dolphin = &H7FFF0000
-                ElseIf title = "Dolphin 5.0" OrElse title.StartsWith("Dolphin 5.0 |") Then
-                    dolphin = -&H10000
-                Else
-                    error_message.Text = "This version of Dolphin is not supported. Please use Dolphin 5.0 or 4.0.2."
-                    Return
-                End If
+                Dim version As Integer
+                For x = 0 To 3
+                    If title = dolphin_version(x) OrElse title.StartsWith(dolphin_version(x) & " |") Then
+                        version = x + 1
+                        Exit For
+                    End If
+                Next
+                Select Case version
+                    Case 1 To 3
+                        dolphin = &H7FFF0000        '4.0, 4.0.1, 4.0.2
+                    Case 4
+                        dolphin = -&H10000          '5.0
+                    Case 0
+                        error_message.Text = "This version of Dolphin is not supported. Please use Dolphin 5.0 or 4.0.x."
+                        Return
+                End Select
                 hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0, emulator(0).Id)
                 If hProcess = IntPtr.Zero Then
                     CloseHandle(hProcess)
@@ -909,10 +918,24 @@ Public Class Main
             .Clear()
             Dim source As Control = context.SourceControl
             If source Is Me Then
+                context.ShowCheckMargin = True
                 .Add("Temporary boost")
+                Dim offset As New ToolStripMenuItem
+                offset.Checked = My.Settings.ApplyOffset
+                offset.Text = "Apply offset to addresses"
+                .Add(offset)
                 .Add("Deck Viewer v" & version)
                 .Item(0).Font = New Font("Segoe UI", 9, FontStyle.Bold)
+                For i = 0 To 2
+                    .Item(i).Tag = i + 1
+                Next
                 Return
+            End If
+
+            context.ShowCheckMargin = False
+            Dim dolphin As Integer
+            If My.Settings.ApplyOffset Then
+                dolphin = Me.dolphin
             End If
 
             'battle id
@@ -980,11 +1003,13 @@ Public Class Main
     End Sub
 
     Private Sub CopyAddress(sender As Object, e As ToolStripItemClickedEventArgs)
-        Dim text As String = e.ClickedItem.Text
-        Select Case text
-            Case "Temporary boost"
+        Dim tag As String = e.ClickedItem.Tag
+        Select Case tag
+            Case 1
                 OpenBoost()
-            Case "Deck Viewer v" & version
+            Case 2
+                My.Settings.ApplyOffset = Not My.Settings.ApplyOffset
+            Case 3
                 ViewDocumentation()
             Case Else
                 Clipboard.SetText(e.ClickedItem.Text)
