@@ -35,6 +35,7 @@
 
         panel = New CustomPanel()
         panel.Size = New Size(Width - 16, Height - 16)
+        panel.Dock = DockStyle.Fill
         Controls.Add(panel)
 
         For x = 0 To 4
@@ -124,9 +125,7 @@
         End With
         panel.Controls.Add(dummy)
 
-        AddHandler Resize, AddressOf ResizePanel
         Show()
-        ResizePanel()
         panel.Focus()
     End Sub
 
@@ -154,8 +153,7 @@
         x = Asc(str.ElementAt(0))
         y = "&H" & str.ElementAt(1)
         z = "&H" & str.ElementAt(2)
-        Dim hex As String = Conversion.Hex(address(x, y, z))
-        context.Items.Add(hex)
+        context.Items.Add(Hex(Main.dolphin + address(x, y, z)))
     End Sub
 
     Private Sub CopyAddress(sender As Object, e As ToolStripItemClickedEventArgs)
@@ -167,11 +165,7 @@
         My.Settings.BoostWindowSize = Size
     End Sub
 
-    Private Sub ResizePanel()
-        panel.Size = New Size(Width - 16, Height - 38)
-    End Sub
-
-    Public Sub UpdateRows(rows As Integer)
+    Public Sub AdjustPositions()
         If scroll_pos = panel.AutoScrollPosition Then
             Return
         End If
@@ -193,7 +187,7 @@
                 legend(1, x).Location = New Point(250 + x * 60, 45) + scroll_pos
             End If
         Next
-        For x = 0 To rows
+        For x = 0 To 8
             legend(2, x).Location = New Point(20, 70 + x * 50) + scroll_pos
         Next
         For x = 0 To 18
