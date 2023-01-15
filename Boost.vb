@@ -205,6 +205,15 @@
                 Close()
             Case Keys.F1
                 Main.ViewDocumentation()
+            Case Keys.R
+                Dim characters As Integer
+                For x = 0 To 8
+                    If Not legend(2, x).Visible Then
+                        Exit For
+                    End If
+                    characters += 1
+                Next
+                Height = MaximumSize.Height - 450 + characters * 50
         End Select
     End Sub
 End Class

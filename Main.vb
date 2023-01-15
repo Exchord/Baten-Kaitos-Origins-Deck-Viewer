@@ -1099,6 +1099,12 @@ Public Class Main
                 OpenBoost()
             Case Keys.F1
                 ViewDocumentation()
+            Case Keys.R
+                If Not empty Then
+                    Dim card_rows As Integer = Math.Ceiling(deck_size / 15)
+                    Dim characters As Integer = members + partners + enemies
+                    Height = MaximumSize.Height - 585 + card_rows * 90 + characters * 25
+                End If
         End Select
     End Sub
 
