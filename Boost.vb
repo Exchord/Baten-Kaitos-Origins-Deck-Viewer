@@ -2,7 +2,7 @@
     Inherits Form
 
     Public legend(3, 18), table(19, 9, 2), dummy As Label
-    Public address(19, 9, 2) As Int64
+    Public address(19, 9, 2) As UInteger
     Dim context As ContextMenuStrip
     Dim panel As CustomPanel
     Dim scroll_pos As Point

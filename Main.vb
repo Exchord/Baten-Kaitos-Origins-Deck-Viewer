@@ -7,9 +7,9 @@ Public Class Main
     Dim card(60), magnus_cursor, drop(8) As PictureBox
     Dim table(8, 10), error_message, battle_data(12), time_label, battle, next_card, dummy As Label
     Dim context As ContextMenuStrip
-    Dim battle_check, id(60), id_buffer(60), hand_size, deck_size, shuffle, cursor_pos, slot, members, partners, enemies, order(60), battle_id, magnus_size, status_effect(9) As Integer
-    Dim game, pointer_address, offset, time_address, MP_address, partner_address, pointer, battle_time, enemy_lookup, magnus_lookup, battle_address, next_(60), first_card, next_draw, first_out, address(9, 8, 5), card_address(60) As Int64
-    Public dolphin As Int64
+    Dim battle_check, battle_time, id(60), id_buffer(60), hand_size, deck_size, shuffle, cursor_pos, slot, members, partners, enemies, order(60), battle_id, magnus_size, status_effect(9) As Integer
+    Dim game, pointer_address, offset, time_address, MP_address, partner_address, pointer, enemy_lookup, magnus_lookup, battle_address, next_(60), first_card, next_draw, first_out, address(9, 8, 5), card_address(60) As UInteger
+    Public dolphin As Integer
     Dim hooked, empty, opacity_buffer(60) As Boolean
     Dim hProcess As IntPtr
     Dim emulator As Process()
@@ -308,7 +308,7 @@ Public Class Main
                 hooked = True
             End If
 
-            game = Read32(&H80000000L)
+            game = Read32U(&H80000000L)
             If game = &H474B344A Then           'GK4J (Japanese version)
                 pointer_address = &H8086C064L
                 time_address = &H802DDBCCL
@@ -339,7 +339,7 @@ Public Class Main
             error_message.Text = ""
 
             battle_time = Read32(time_address)
-            pointer = Read32(pointer_address)
+            pointer = Read32U(pointer_address)
             If pointer = 0 Then
                 Clear()
                 Return
@@ -370,8 +370,8 @@ Public Class Main
             magnus_cursor.Show()
 
             'get cards and order
-            next_draw = Read32(battle_address + &H950)
-            first_out = Read32(battle_address + &H93C)
+            next_draw = Read32U(battle_address + &H950)
+            first_out = Read32U(battle_address + &H93C)
             deck_size = 60
             For x = 0 To 59
                 id(x) = Read16(battle_address + 6 + x * 36)
@@ -379,11 +379,11 @@ Public Class Main
                     deck_size = x
                     Exit For
                 End If
-                next_(x) = Read32(battle_address + x * 36)
+                next_(x) = Read32U(battle_address + x * 36)
                 If next_(x) <> 0 Then
                     next_(x) = (next_(x) - battle_address) / 36
                 Else
-                    next_(x) = -1
+                    next_(x) = UInteger.MaxValue
                 End If
                 card_address(x) = battle_address + 4 + order(x) * 36
             Next
@@ -400,7 +400,7 @@ Public Class Main
 
     Private Sub DrawDeck()
         'check first card
-        first_card = Read32(battle_address + &H984)
+        first_card = Read32U(battle_address + &H984)
         If first_card = 0 Then
             HideCards(0)
             Return
@@ -428,7 +428,7 @@ Public Class Main
         slot = (first_card - battle_address) / 36
         ShowCard(0, False)
         For x = 1 To hand_size - 1
-            If next_(slot) < 0 Then
+            If next_(slot) = UInteger.MaxValue Then
                 HideCards(x)
                 Return
             End If
@@ -446,7 +446,7 @@ Public Class Main
         slot = (next_draw - battle_address) / 36
         ShowCard(hand_size, False)
         For x = hand_size + 1 To deck_size
-            If next_(slot) < 0 Then
+            If next_(slot) = UInteger.MaxValue Then
                 shuffle = x
                 Exit For
             End If
@@ -464,7 +464,7 @@ Public Class Main
         slot = (first_out - battle_address) / 36
         ShowCard(shuffle, True)
         For x = shuffle + 1 To deck_size
-            If next_(slot) < 0 Then
+            If next_(slot) = UInteger.MaxValue Then
                 HideCards(x)
                 Return
             End If
@@ -495,7 +495,7 @@ Public Class Main
     End Sub
 
     Private Sub ShowBattleResults()
-        Dim EXP, TP, gold As Int64
+        Dim EXP, TP, gold As Integer
         EXP = Read32(time_address + &H34)
         TP = Read32(time_address + &H38)
         gold = Read32(time_address + &H3C)
@@ -562,12 +562,11 @@ Public Class Main
             battle_data(0).Text = "MP"
             battle_data(6).Text = Decimals(MP, False)
         Else
-            Dim burst_timer As Int64 = Read32(battle_address + &HA60)
+            Dim burst_timer As Integer = Read32(battle_address + &HA60)
             battle_data(0).Text = "MP burst"
             battle_data(6).Text = FormatTime(burst_timer, 0)
         End If
         Dim enemy_MP As Integer = Read16(MP_address + &H1C6)
-        enemy_MP = Convert16(enemy_MP)
         battle_data(7).Text = enemy_MP
         For x = 0 To 1
             battle_data(x).Show()
@@ -575,7 +574,6 @@ Public Class Main
         Next
         If partners = 1 Then
             Dim partner_MP As Integer = Read16(MP_address + &H1C2)
-            partner_MP = Convert16(partner_MP)
             battle_data(8).Text = partner_MP
             battle_data(2).Show()
             battle_data(8).Show()
@@ -603,7 +601,7 @@ Public Class Main
                     Continue For
             End Select
 
-            Dim base, addr, speed_address As Int64
+            Dim base, addr, speed_address As UInteger
             Dim i, character As Integer
             Select Case party
                 Case 0
@@ -658,9 +656,9 @@ Public Class Main
 
             'equipment
             Dim armor_speed As Double = 0
-            Dim magnus_address As Int64
+            Dim magnus_address As UInteger
             If party = 0 Then
-                magnus_address = Read32(addr - &H1244)
+                magnus_address = Read32U(addr - &H1244)
             End If
             If magnus_address <> 0 Then
                 Dim magnus_effect As Integer
@@ -679,8 +677,8 @@ Public Class Main
 
             'aura
             Dim char_speed As Double = 1
-            If party = 0 AndAlso Read32(base + &H1214) <> 0 Then
-                Dim aura_timer As Int64
+            If party = 0 AndAlso Read32U(base + &H1214) <> 0 Then
+                Dim aura_timer As Integer
                 address(y, 7, 0) = base + &H1360
                 aura_timer = Read32(base + &H1360)
                 table(7, y).Text = FormatTime(aura_timer, 0)
@@ -718,7 +716,7 @@ Public Class Main
             'delay
             address(y, 2, 0) = base + &H1C
             address(y, 2, 1) = base + 4
-            Dim delay As Int64 = Read32(base + &H1C)
+            Dim delay As Integer = Read32(base + &H1C)
             If delay = 0 Then
                 If state < 4 Or state = 7 Then
                     delay = Read32(base + 4)
@@ -736,19 +734,19 @@ Public Class Main
                         delay += 590                        'enemies and partners always take 1.97 seconds to "select magnus"
                     End If
                 Else
-                    delay = Int64.MaxValue                'speed <= 0: permanently unable to act
+                    delay = Integer.MaxValue                'speed <= 0: permanently unable to act
                 End If
             End If
             table(2, y).Text = FormatTime(delay, 0)
 
             'down
             address(y, 3, 0) = base + &H20
-            Dim down As Int64 = Read32(base + &H20)
+            Dim down As Integer = Read32(base + &H20)
             If down > 0 Then
                 If speed > 0 Then
                     down = Math.Ceiling(down / speed)
                 Else
-                    down = Int64.MaxValue
+                    down = Integer.MaxValue
                 End If
             End If
             table(3, y).Text = FormatTime(down, 0)
@@ -761,9 +759,9 @@ Public Class Main
             'poison
             address(y, 5, 0) = base + &H1128
             address(y, 5, 1) = base + &H1134
-            Dim poison1 As Int64 = Read32(base + &H1128)                        'poison timer
+            Dim poison1 As Integer = Read32(base + &H1128)                      'poison timer
             If poison1 > 0 Then
-                Dim poison2 As Int64 = Read32(base + &H1134)                    'poison damage timer
+                Dim poison2 As Integer = Read32(base + &H1134)                  'poison damage timer
                 table(5, y).Text = FormatTime(poison1, 0) & " (" & FormatTime(poison2, 0) & ")"
             Else
                 table(5, y).Text = ""
@@ -776,12 +774,12 @@ Public Class Main
             address(y, 6, 3) = base + &H1120
             address(y, 6, 4) = base + &H1124
             Dim effect_offset() As Integer = {&H1118, &H111C, &H1120, &H1124}   'flames, frozen, shock, blind
-            Dim effect As Int64
+            Dim effect As Integer
             For x = 0 To 3
                 effect = Read32(base + effect_offset(x))                        'effect timer
                 If effect > 0 Then
                     If x = 0 Then
-                        Dim flames As Int64 = Read32(base + &H1130)             'flames damage timer
+                        Dim flames As Integer = Read32(base + &H1130)           'flames damage timer
                         table(6, y).Text = FormatTime(effect, 0) & " (" & FormatTime(flames, 0) & ")"
                     Else
                         table(6, y).Text = FormatTime(effect, 0)
@@ -805,10 +803,10 @@ Public Class Main
     Private Sub ShowBoost()
         Dim value As Double
         Dim characters As Integer = members + partners + enemies
-        Dim address As Int64
+        Dim address As UInteger
         For y = 0 To characters - 1
             Boost.legend(2, y).Text = table(0, y + 1).Text      'names
-            Dim base As Int64
+            Dim base As UInteger
             Select Case y
                 Case < members
                     base = Me.address(y + 1, 0, 0) - &H12C              'party member
@@ -965,7 +963,7 @@ Public Class Main
 
             'MP & results
             If battle_data.Contains(source) Then
-                Dim address() As Int64 = {MP_address, MP_address + &H1C4, MP_address + &H1C0, time_address + &H34, time_address + &H38, time_address + &H3C}
+                Dim address() As UInteger = {MP_address, MP_address + &H1C4, MP_address + &H1C0, time_address + &H34, time_address + &H38, time_address + &H3C}
                 .Add(Hex(dolphin + address(x)))
                 If x = 0 And battle_data(0).Text = "MP burst" Then
                     .Add(Hex(dolphin + battle_address + &HA60))
@@ -1016,13 +1014,11 @@ Public Class Main
         End Select
     End Sub
 
-    Public Function FormatTime(input As Int64, min_length As Integer) As String
-        If input = Int64.MaxValue Then
+    Public Function FormatTime(input As Integer, min_length As Integer) As String
+        If input = Integer.MaxValue Then
             Return "∞"                      'speed <= 0: permanently unable to act
         End If
-        If input > Integer.MaxValue Then    'negative delays are not displayed
-            input = 0
-        End If
+        input = Math.Max(input, 0)
         If input = 0 And min_length = 0 Then
             Return ""
         End If
@@ -1058,30 +1054,31 @@ Public Class Main
         Return Math.Max(min, Math.Min(input, max))
     End Function
 
-    Public Function Convert16(input As Integer) As Integer      'limit number to Int16 range (-32768 through 32767)
-        If input > Int16.MaxValue Then
-            input += 2 * Int16.MinValue
-        End If
-        Return input
-    End Function
-
-    Public Function Read16(address As Int64) As Integer
+    Public Function Read16(address As UInteger) As Integer
         Dim buffer As Integer
         ReadProcessMemory(hProcess, address + dolphin, buffer, 2, 0)
         Dim bytes() As Byte = BitConverter.GetBytes(buffer)
-        Return bytes(0) * 256 + bytes(1)
+        Array.Reverse(bytes)
+        Return BitConverter.ToInt16(bytes, 2)
     End Function
 
-    Public Function Read32(address As Int64) As Int64
-        Dim buffer As Int64
+    Public Function Read32(address As UInteger) As Integer
+        Dim buffer As Integer
         ReadProcessMemory(hProcess, address + dolphin, buffer, 4, 0)
         Dim bytes() As Byte = BitConverter.GetBytes(buffer)
-        Array.Reverse(bytes, 0, 4)
-        Array.Clear(bytes, 4, 4)
-        Return BitConverter.ToInt64(bytes, 0)
+        Array.Reverse(bytes)
+        Return BitConverter.ToInt32(bytes, 0)
     End Function
 
-    Public Function ReadFloat(address As Int64) As Double
+    Public Function Read32U(address As UInteger) As UInteger
+        Dim buffer As Integer
+        ReadProcessMemory(hProcess, address + dolphin, buffer, 4, 0)
+        Dim bytes() As Byte = BitConverter.GetBytes(buffer)
+        Array.Reverse(bytes)
+        Return BitConverter.ToUInt32(bytes, 0)
+    End Function
+
+    Public Function ReadFloat(address As UInteger) As Double
         Dim buffer As Integer
         ReadProcessMemory(hProcess, address + dolphin, buffer, 4, 0)
         Dim bytes() As Byte = BitConverter.GetBytes(buffer)
@@ -1115,7 +1112,7 @@ Public Class Main
     End Sub
 
     Public Sub ViewDocumentation()
-        Process.Start("https://github.com/Exchord/Baten-Kaitos-Origins-Deck-Viewer#contents")
+        Process.Start("https://github.com/Exchord/Baten-Kaitos-Origins-Deck-Viewer#readme")
     End Sub
 
     Private Sub Keyboard(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
