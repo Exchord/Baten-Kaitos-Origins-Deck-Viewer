@@ -297,6 +297,13 @@ Public Class Main
                     Case 4
                         dolphin = -&H10000          '5.0
                     Case 0
+                        Dim secondary_window() As String = {"TAS Input", "Memory Card Manager", "Cheat Manager", "Cheats Manager"}
+                        For x = 0 To 3
+                            If title.StartsWith(secondary_window(x)) Then
+                                error_message.Text = "Please close and reopen " & secondary_window(x) & " to proceed."
+                                Return
+                            End If
+                        Next
                         error_message.Text = "This version of Dolphin is not supported. Please use Dolphin 5.0 or 4.0.x."
                         Return
                 End Select
