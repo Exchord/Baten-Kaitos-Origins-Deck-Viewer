@@ -14,7 +14,7 @@ Public Class Main
     Dim hProcess As IntPtr
     Dim emulator As Process()
     Dim timer As Timer
-    Dim version As String
+    Public version As String
 
     Public ReadOnly default_color As Color = Color.FromArgb(&H90, &HFF, &HFF, &HFF)
     ReadOnly variable() As String = {"MP", "Enemy MP", "Partner MP", "EXP", "TP", "Gold"}
@@ -43,6 +43,7 @@ Public Class Main
 
     Public ReadOnly element_color() As Color = {Color.FromArgb(&H90, &HA8, &H5A, &H2A), Color.FromArgb(&H90, &HFF, &H20, &H0), Color.FromArgb(&H90, &H0, &HB0, &HFF), Color.FromArgb(&H90, &H0, &HB0, &H0), Color.FromArgb(&H90, &HC0, &HC0, &HC0), Color.FromArgb(&H90, &HC0, &H0, &HFF)}
     Public ReadOnly status_color() As Color = {element_color(1), element_color(2), element_color(3), element_color(5)}
+    Public ReadOnly bold As New Font("Segoe UI", 9, FontStyle.Bold)
     ReadOnly dolphin_version() As String = {"Dolphin 4.0", "Dolphin 4.0.1", "Dolphin 4.0.2", "Dolphin 5.0"}
 
     Private Declare Function OpenProcess Lib "kernel32" (dwDesiredAccess As Integer, bInheritHandle As Integer, dwProcessId As Integer) As Integer
@@ -149,7 +150,7 @@ Public Class Main
             .Size = New Size(50, 20)
             .BackColor = default_color
             .TextAlign = ContentAlignment.MiddleCenter
-            .Font = New Font("Segoe UI", 9, FontStyle.Bold)
+            .Font = bold
             .Text = "NEXT"
         End With
         panel.Controls.Add(next_card)
@@ -172,7 +173,7 @@ Public Class Main
                     .Top = 135 + 25 * y
                     .TextAlign = ContentAlignment.MiddleCenter
                     If y = 0 Then
-                        .Font = New Font("Segoe UI", 9, FontStyle.Bold)
+                        .Font = bold
                         .Text = column(x)
                     Else
                         .ContextMenuStrip = context
@@ -521,9 +522,9 @@ Public Class Main
             If id = 0 Then
                 Exit For
             End If
-            If x < 3 Then           'only the first 3 drops are added to the inventory
+            If x < 3 Then
                 drop(x).Image = New Bitmap(magnus(id), New Size(30, 48))
-            Else                    'the rest are only added to the field guide
+            Else
                 drop(x).Image = ChangeOpacity(New Bitmap(magnus(id), New Size(30, 48)))
             End If
             drop(x).Show()
@@ -912,9 +913,9 @@ Public Class Main
     End Sub
 
     Private Sub OpenContextMenu()
+        Dim source As Control = context.SourceControl
         With context.Items
             .Clear()
-            Dim source As Control = context.SourceControl
             If source Is Me Then
                 context.ShowCheckMargin = True
                 .Add("Temporary boost")
@@ -923,7 +924,7 @@ Public Class Main
                 offset.Text = "Apply offset to addresses"
                 .Add(offset)
                 .Add("Deck Viewer v" & version)
-                .Item(0).Font = New Font("Segoe UI", 9, FontStyle.Bold)
+                .Item(0).Font = bold
                 For i = 0 To 2
                     .Item(i).Tag = i + 1
                 Next
@@ -992,10 +993,10 @@ Public Class Main
             'highlight effect
             Dim effect As Integer = status_effect(y - 1)
             If effect = 1 Then
-                .Item(0).Font = New Font("Segoe UI", 9, FontStyle.Bold)
-                .Item(1).Font = New Font("Segoe UI", 9, FontStyle.Bold)
+                .Item(0).Font = bold
+                .Item(1).Font = bold
             ElseIf effect > 1 Then
-                .Item(effect).Font = New Font("Segoe UI", 9, FontStyle.Bold)
+                .Item(effect).Font = bold
             End If
         End With
     End Sub

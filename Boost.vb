@@ -28,7 +28,7 @@
         context = New ContextMenuStrip()
         With context
             .ShowImageMargin = False
-            .Items.Add("0")
+            .Items.Add("")
             AddHandler .Opening, AddressOf OpenContextMenu
             AddHandler .ItemClicked, AddressOf CopyAddress
         End With
@@ -54,7 +54,7 @@
                 End Select
                 .BackColor = Main.default_color
                 .TextAlign = ContentAlignment.MiddleCenter
-                .Font = New Font("Segoe UI", 9, FontStyle.Bold)
+                .Font = Main.bold
                 .Text = column_name(x)
             End With
             panel.Controls.Add(legend(0, x))
@@ -69,7 +69,7 @@
                     .Location = New Point(250 + x * 60, 45)
                 End If
                 .TextAlign = ContentAlignment.MiddleCenter
-                .Font = New Font("Segoe UI", 9, FontStyle.Bold)
+                .Font = Main.bold
                 If x < 12 Then
                     .Text = element_name(x Mod 6)
                     .BackColor = Main.element_color(x Mod 6)
@@ -125,6 +125,7 @@
         End With
         panel.Controls.Add(dummy)
 
+        ContextMenuStrip = context
         Show()
         panel.Focus()
     End Sub
@@ -146,22 +147,43 @@
     End Sub
 
     Private Sub OpenContextMenu()
-        context.Items.Clear()
         Dim source As Control = context.SourceControl
-        Dim str As String = source.Tag.ToString
-        Dim x, y, z As Integer
-        x = Asc(str.ElementAt(0))
-        y = "&H" & str.ElementAt(1)
-        z = "&H" & str.ElementAt(2)
-        Dim dolphin As Integer
-        If My.Settings.ApplyOffset Then
-            dolphin = Main.dolphin
-        End If
-        context.Items.Add(Hex(dolphin + address(x, y, z)))
+        With context.Items
+            .Clear()
+            If source Is Me Then
+                context.ShowCheckMargin = True
+                Dim offset As New ToolStripMenuItem
+                offset.Checked = My.Settings.ApplyOffset
+                offset.Text = "Apply offset to addresses"
+                .Add(offset)
+                .Add("Deck Viewer v" & Main.version)
+                .Item(0).Tag = 1
+                .Item(1).Tag = 2
+                Return
+            End If
+            Dim str As String = source.Tag.ToString
+            Dim x, y, z As Integer
+            x = Asc(str.ElementAt(0))
+            y = "&H" & str.ElementAt(1)
+            z = "&H" & str.ElementAt(2)
+            Dim dolphin As Integer
+            If My.Settings.ApplyOffset Then
+                dolphin = Main.dolphin
+            End If
+            .Add(Hex(dolphin + address(x, y, z)))
+        End With
     End Sub
 
     Private Sub CopyAddress(sender As Object, e As ToolStripItemClickedEventArgs)
-        Clipboard.SetText(e.ClickedItem.Text)
+        Dim tag As String = e.ClickedItem.Tag
+        Select Case tag
+            Case 1
+                My.Settings.ApplyOffset = Not My.Settings.ApplyOffset
+            Case 2
+                Main.ViewDocumentation()
+            Case Else
+                Clipboard.SetText(e.ClickedItem.Text)
+        End Select
     End Sub
 
     Private Sub SaveWindowData() Handles Me.FormClosing
