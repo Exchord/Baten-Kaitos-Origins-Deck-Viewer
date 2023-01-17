@@ -92,7 +92,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("1002, 543")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("1003, 544")>  _
         Public Property BoostWindowSize() As Global.System.Drawing.Size
             Get
                 Return CType(Me("BoostWindowSize"),Global.System.Drawing.Size)
