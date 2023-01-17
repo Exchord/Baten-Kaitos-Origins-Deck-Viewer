@@ -2,7 +2,7 @@
 
 This tool displays real-time information during battles, including the entire deck and lots of hidden variables.
 
-[Download (to be added)](https://github.com/Exchord/Baten-Kaitos-Origins-Deck-Viewer/releases)
+[Download](https://github.com/Exchord/Baten-Kaitos-Origins-Deck-Viewer/releases)
 
 Information on enemies and magnus: [BKO Documentation](https://docs.google.com/spreadsheets/d/1wXsL9PXnyIuvRiYNgX5p6uTaVBgJhXU1CDzXNFiwLRU/view#gid=1457790647)
 
