@@ -14,7 +14,7 @@
 
     Private Sub Open() Handles MyBase.Load
         Hide()
-        Font = New Font("Segoe UI", 9, FontStyle.Regular)
+        Font = New Font("Segoe UI", 9)
         Text = "Temporary Boost"
         MaximizeBox = False
         Icon = New Icon(Me.GetType(), "icon.ico")
@@ -152,6 +152,7 @@
             .Clear()
             If source Is Me Then
                 context.ShowCheckMargin = True
+                context.Font = Font
                 Dim offset As New ToolStripMenuItem
                 offset.Checked = My.Settings.ApplyOffset
                 offset.Text = "Apply offset to addresses"
@@ -161,15 +162,18 @@
                 .Item(1).Tag = 2
                 Return
             End If
+
+            context.ShowCheckMargin = False
+            context.Font = New Font("Consolas", 10)
+            Dim dolphin As Integer
+            If My.Settings.ApplyOffset Then
+                dolphin = Main.dolphin
+            End If
             Dim str As String = source.Tag.ToString
             Dim x, y, z As Integer
             x = Asc(str.ElementAt(0))
             y = "&H" & str.ElementAt(1)
             z = "&H" & str.ElementAt(2)
-            Dim dolphin As Integer
-            If My.Settings.ApplyOffset Then
-                dolphin = Main.dolphin
-            End If
             .Add(Hex(dolphin + address(x, y, z)))
         End With
     End Sub

@@ -54,7 +54,7 @@ Public Class Main
     Private Sub Open() Handles MyBase.Load
         Hide()
         Application.CurrentCulture = New Globalization.CultureInfo("EN-US")
-        Font = New Font("Segoe UI", 9, FontStyle.Regular)
+        Font = New Font("Segoe UI", 9)
         Text = "Baten Kaitos Origins Deck Viewer"
         MaximizeBox = False
         Icon = New Icon(Me.GetType(), "icon.ico")
@@ -85,7 +85,7 @@ Public Class Main
             .AutoSize = True
             .BackColor = Color.DarkRed
             .ForeColor = Color.Transparent
-            .Font = New Font("Segoe UI", 10, FontStyle.Regular)
+            .Font = New Font("Segoe UI", 10)
         End With
         Controls.Add(error_message)
 
@@ -925,6 +925,7 @@ Public Class Main
             .Clear()
             If source Is Me Then
                 context.ShowCheckMargin = True
+                context.Font = Font
                 .Add("Temporary boost")
                 Dim offset As New ToolStripMenuItem
                 offset.Checked = My.Settings.ApplyOffset
@@ -939,6 +940,7 @@ Public Class Main
             End If
 
             context.ShowCheckMargin = False
+            context.Font = New Font("Consolas", 10)
             Dim dolphin As Integer
             If My.Settings.ApplyOffset Then
                 dolphin = Me.dolphin
@@ -998,12 +1000,13 @@ Public Class Main
             Next
 
             'highlight effect
+            Dim bold_monospace As New Font("Consolas", 10, FontStyle.Underline)
             Dim effect As Integer = status_effect(y - 1)
             If effect = 1 Then
-                .Item(0).Font = bold
-                .Item(1).Font = bold
+                .Item(0).Font = bold_monospace
+                .Item(1).Font = bold_monospace
             ElseIf effect > 1 Then
-                .Item(effect).Font = bold
+                .Item(effect).Font = bold_monospace
             End If
         End With
     End Sub
