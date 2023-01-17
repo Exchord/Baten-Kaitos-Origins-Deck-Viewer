@@ -1000,13 +1000,13 @@ Public Class Main
             Next
 
             'highlight effect
-            Dim bold_monospace As New Font("Consolas", 10, FontStyle.Underline)
+            Dim highlight As New Font("Consolas", 10, FontStyle.Underline)
             Dim effect As Integer = status_effect(y - 1)
             If effect = 1 Then
-                .Item(0).Font = bold_monospace
-                .Item(1).Font = bold_monospace
+                .Item(0).Font = highlight
+                .Item(1).Font = highlight
             ElseIf effect > 1 Then
-                .Item(effect).Font = bold_monospace
+                .Item(effect).Font = highlight
             End If
         End With
     End Sub
