@@ -354,7 +354,7 @@ Public Class Main
             End If
 
             battle_check = Read16(pointer + 148)
-            If battle_check = &HFFFF Or battle_check = 3 Then       'FFFF: battle loading; 3: actual battle
+            If battle_check = -1 Or battle_check = 3 Then           '-1: cutscene / transition to battle; 3: ongoing battle
                 battle_id = Read16(time_address - &HA6)
                 battle.Text = "Battle: " & battle_id
                 battle.Show()
@@ -928,8 +928,8 @@ Public Class Main
                 context.Font = Font
                 .Add("Temporary boost")
                 Dim offset As New ToolStripMenuItem
-                offset.Checked = My.Settings.ApplyOffset
-                offset.Text = "Apply offset to addresses"
+                offset.Checked = My.Settings.PhysicalAddresses
+                offset.Text = "Show physical addresses"
                 .Add(offset)
                 .Add("Deck Viewer v" & version)
                 .Item(0).Font = bold
@@ -942,7 +942,7 @@ Public Class Main
             context.ShowCheckMargin = False
             context.Font = New Font("Consolas", 10)
             Dim dolphin As Integer
-            If My.Settings.ApplyOffset Then
+            If My.Settings.PhysicalAddresses Then
                 dolphin = Me.dolphin
             End If
 
@@ -1017,7 +1017,7 @@ Public Class Main
             Case 1
                 OpenBoost()
             Case 2
-                My.Settings.ApplyOffset = Not My.Settings.ApplyOffset
+                My.Settings.PhysicalAddresses = Not My.Settings.PhysicalAddresses
             Case 3
                 ViewDocumentation()
             Case Else

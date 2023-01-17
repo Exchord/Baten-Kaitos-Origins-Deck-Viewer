@@ -105,12 +105,12 @@ Namespace My
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
-        Public Property ApplyOffset() As Boolean
+        Public Property PhysicalAddresses() As Boolean
             Get
-                Return CType(Me("ApplyOffset"),Boolean)
+                Return CType(Me("PhysicalAddresses"),Boolean)
             End Get
             Set
-                Me("ApplyOffset") = value
+                Me("PhysicalAddresses") = value
             End Set
         End Property
     End Class

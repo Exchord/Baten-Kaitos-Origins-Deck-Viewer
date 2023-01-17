@@ -154,8 +154,8 @@
                 context.ShowCheckMargin = True
                 context.Font = Font
                 Dim offset As New ToolStripMenuItem
-                offset.Checked = My.Settings.ApplyOffset
-                offset.Text = "Apply offset to addresses"
+                offset.Checked = My.Settings.PhysicalAddresses
+                offset.Text = "Show physical addresses"
                 .Add(offset)
                 .Add("Deck Viewer v" & Main.version)
                 .Item(0).Tag = 1
@@ -166,7 +166,7 @@
             context.ShowCheckMargin = False
             context.Font = New Font("Consolas", 10)
             Dim dolphin As Integer
-            If My.Settings.ApplyOffset Then
+            If My.Settings.PhysicalAddresses Then
                 dolphin = Main.dolphin
             End If
             Dim str As String = source.Tag.ToString
@@ -182,7 +182,7 @@
         Dim tag As String = e.ClickedItem.Tag
         Select Case tag
             Case 1
-                My.Settings.ApplyOffset = Not My.Settings.ApplyOffset
+                My.Settings.PhysicalAddresses = Not My.Settings.PhysicalAddresses
             Case 2
                 Main.ViewDocumentation()
             Case Else
@@ -243,7 +243,7 @@
                     End If
                     characters += 1
                 Next
-                Height = MaximumSize.Height - 450 + characters * 50
+                Height = MaximumSize.Height - 449 + characters * 50
         End Select
     End Sub
 End Class

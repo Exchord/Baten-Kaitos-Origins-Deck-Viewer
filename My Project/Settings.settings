@@ -14,7 +14,7 @@
     <Setting Name="BoostWindowSize" Type="System.Drawing.Size" Scope="User">
       <Value Profile="(Default)">1002, 543</Value>
     </Setting>
-    <Setting Name="ApplyOffset" Type="System.Boolean" Scope="User">
+    <Setting Name="PhysicalAddresses" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
