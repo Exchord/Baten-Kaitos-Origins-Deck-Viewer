@@ -7,11 +7,6 @@
     Dim panel As CustomPanel
     Dim scroll_pos As Point
 
-    ReadOnly column_name() As String = {"Character", "Speed", "Offense", "Defense", "Resistance"}
-    ReadOnly element_name() As String = {"Physical", "Fire", "Ice", "Lightning", "Light", "Darkness"}
-    ReadOnly resistance() As String = {"Flames", "Freezing", "Shock", "Blindness", "Poison", "Sleep"}
-    ReadOnly secondary_color As Color = Color.FromArgb(&H70, &HFF, &HFF, &HFF)
-
     Private Sub Open() Handles MyBase.Load
         Hide()
         Font = New Font("Segoe UI", 9)
@@ -19,11 +14,17 @@
         MaximizeBox = False
         Icon = New Icon(Me.GetType(), "icon.ico")
         MinimumSize = New Size(626, 243)
-        MaximumSize = New Size(1381, 593)
+        MaximumSize = New Size(1381, 594)
         DoubleBuffered = True
         KeyPreview = True
         BackColor = Color.DarkGray
         LoadWindowData()
+
+        Dim column_name() As String = {"Character", "Speed", "Offense", "Defense", "Resistance"}
+        Dim element_name() As String = {"Physical", "Fire", "Ice", "Lightning", "Light", "Darkness"}
+        Dim resistance() As String = {"Flames", "Freezing", "Shock", "Blindness", "Poison", "Sleep"}
+        Dim secondary_color As Color = Color.FromArgb(&H70, &HFF, &HFF, &HFF)
+        Dim default_color As Color = Color.FromArgb(&H90, &HFF, &HFF, &HFF)
 
         context = New ContextMenuStrip()
         With context
@@ -52,7 +53,7 @@
                         .Size = New Size(359, 24)
                         .Location = New Point(x * 360 - 470, 20)
                 End Select
-                .BackColor = Main.default_color
+                .BackColor = default_color
                 .TextAlign = ContentAlignment.MiddleCenter
                 .Font = Main.bold
                 .Text = column_name(x)
@@ -78,7 +79,7 @@
                     If x < 16 Then
                         .BackColor = Main.status_color(x Mod 6)
                     Else
-                        .BackColor = Main.default_color
+                        .BackColor = default_color
                     End If
                 End If
             End With
@@ -88,7 +89,7 @@
             legend(2, x) = New Label()
             With legend(2, x)
                 .Hide()
-                .BackColor = Main.default_color
+                .BackColor = default_color
                 .Size = New Size(169, 49)
                 .Location = New Point(20, 70 + x * 50)
                 .TextAlign = ContentAlignment.MiddleCenter
@@ -106,7 +107,7 @@
                         .Location = New Point(190 + x * 60, 70 + y * 50 + z * 25)
                         .TextAlign = ContentAlignment.MiddleCenter
                         If z = 0 Then
-                            .BackColor = Main.default_color
+                            .BackColor = default_color
                         Else
                             .BackColor = secondary_color
                         End If
@@ -243,7 +244,7 @@
                     End If
                     characters += 1
                 Next
-                Height = MaximumSize.Height - 449 + characters * 50
+                Height = MaximumSize.Height - 450 + characters * 50
         End Select
     End Sub
 End Class

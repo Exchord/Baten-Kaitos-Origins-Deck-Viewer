@@ -16,27 +16,7 @@ Public Class Main
     Dim timer As Timer
     Public version As String
 
-    Public ReadOnly default_color As Color = Color.FromArgb(&H90, &HFF, &HFF, &HFF)
-    ReadOnly variable() As String = {"MP", "Enemy MP", "Partner MP", "EXP", "TP", "Gold"}
-    ReadOnly column() As String = {"Character", "HP", "Delay", "Down", "Crush", "Poison", "Effect", "Aura"}
-
-    ReadOnly character() As String = {"", "Sagi", "Milly", "Guillo", "Empire Grunt", "Imperial Elite", "Dark Serviceman", "Imperial Guard", "Elite Imperial Guard" _
-        , "Dark Service Peon", "Dark Service Officer", "Fallen Serviceman", "Imperial Swordsman", "Elite Swordsman", "Dark Service Swordsman", "Dark Service Swordmaster" _
-        , "Imperial Swordguard", "Alpha Paramachina", "Beta Paramachina", "Upgraded Paramachina", "Imperial Battle Machina", "Autonomous Battle Machina" _
-        , "Masterless Battle Machina", "Cancerite", "Cloud Cancerite", "Mad Cancerite", "Armored Cancerite", "Unuk", "Striper", "Magma Beast" _
-        , "Shawra", "Blood Leaf", "Badwin", "Filler", "Doomer", "Gormer", "Almer", "Zelmer", "Albireo", "Ray-Moo" _
-        , "Pul-Puk", "Bar-Mool", "Spell Shellfish", "Magic Shellfish", "Skeleton Warrior", "Undead Swordsman", "Ghoulish Skirmisher", "Devil Claws", "Shadow Claws" _
-        , "Ghost Claws", "Ceratobus", "Foytow", "Rulug", "Mirablis", "Lanocaulis", "Acheron", "Maw-Maw-Goo", "Caracal", "Lesser Caracal", "Shadow Caracal" _
-        , "King Caracal", "Orvata", "Vata", "Balloona", "Fogg", "Armored Balloona", "Slave Balloona", "Alraune", "Queen Alraune", "Ballet Dancer", "Dance King", "Devil's Doll" _
-        , "Machina Ballerina", "Prima Queen", "Larva Golem", "Cicada Golem", "Ogopogo", "Gigim", "Vodnik", "Juggler", "Master Juggler", "Ahriman", "Mite" _
-        , "Magician Mite", "Wizard Mite", "Armored Mite", "Goat Chimera", "Phoelix", "Nixie Chimera", "Mobile Turret", "High-Mobility Cannon", "Geryon" _
-        , "Nebulos", "Monoceros", "Lycaon", "Medium", "Shaman", "Saber Dragon", "Hercules Dragon", "Dragon", "Arma Prototype M", "Hideous Beast 1" _
-        , "Hideous Beast 2", "Umbra", "Malpercio's Afterling 1", "Malpercio's Afterling 2", "Giacomo 1", "Giacomo 2", "Giacomo 3", "Valara 1", "Valara 2", "Heughes 1", "Heughes 2" _
-        , "Nasca 1", "Nasca 2", "Machina Arma: Razer 1", "Machina Arma: Razer 2", "Machina Arma: Razer 3", "Promachina Heughes 1", "Promachina Heughes 2", "Machina Arma: Marauder 1", "Machina Arma: Marauder 2" _
-        , "Cannon", "Cockpit", "Guillo", "Seginus", "Sandfeeder", "Hearteater", "Holoholobird", "Mange-Roches", "Holoholo Chick", "Lord of the Lava Caves" _
-        , "Rudra", "Promachina Shanath", "Black Dragon", "Wiseman", "Baelheit", "Verus", "Machinanguis A", "Machinanguis B", "Verus-Wiseman" _
-        , "Holoholo Egg", "Malpercio's Afterling 2 (head)", "Mr. Quintain", "nero_parts", "Machina Arma: Razer"}
-
+    ReadOnly character() As String = {"", "Sagi", "Milly", "Guillo", "Empire Grunt", "Imperial Elite", "Dark Serviceman", "Imperial Guard", "Elite Imperial Guard", "Dark Service Peon", "Dark Service Officer", "Fallen Serviceman", "Imperial Swordsman", "Elite Swordsman", "Dark Service Swordsman", "Dark Service Swordmaster", "Imperial Swordguard", "Alpha Paramachina", "Beta Paramachina", "Upgraded Paramachina", "Imperial Battle Machina", "Autonomous Battle Machina", "Masterless Battle Machina", "Cancerite", "Cloud Cancerite", "Mad Cancerite", "Armored Cancerite", "Unuk", "Striper", "Magma Beast", "Shawra", "Blood Leaf", "Badwin", "Filler", "Doomer", "Gormer", "Almer", "Zelmer", "Albireo", "Ray-Moo", "Pul-Puk", "Bar-Mool", "Spell Shellfish", "Magic Shellfish", "Skeleton Warrior", "Undead Swordsman", "Ghoulish Skirmisher", "Devil Claws", "Shadow Claws", "Ghost Claws", "Ceratobus", "Foytow", "Rulug", "Mirabilis", "Lanocaulis", "Acheron", "Maw-Maw-Goo", "Caracal", "Lesser Caracal", "Shadow Caracal", "King Caracal", "Orvata", "Vata", "Balloona", "Fogg", "Armored Balloona", "Slave Balloona", "Alraune", "Queen Alraune", "Ballet Dancer", "Dance King", "Devil's Doll", "Machina Ballerina", "Prima Queen", "Larva Golem", "Cicada Golem", "Ogopogo", "Gigim", "Vodnik", "Juggler", "Master Juggler", "Ahriman", "Mite", "Magician Mite", "Wizard Mite", "Armored Mite", "Goat Chimera", "Phoelix", "Nixie Chimera", "Mobile Turret", "High-Mobility Cannon", "Geryon", "Nebulos", "Monoceros", "Lycaon", "Medium", "Shaman", "Saber Dragon", "Hercules Dragon", "Dragon", "Arma Prototype M", "Hideous Beast 1", "Hideous Beast 2", "Umbra", "Malpercio's Afterling 1", "Malpercio's Afterling 2", "Giacomo 1", "Giacomo 2", "Giacomo 3", "Valara 1", "Valara 2", "Heughes 1", "Heughes 2", "Nasca 1", "Nasca 2", "Machina Arma: Razer 1", "Machina Arma: Razer 2", "Machina Arma: Razer 3", "Promachina Heughes 1", "Promachina Heughes 2", "Machina Arma: Marauder 1", "Machina Arma: Marauder 2", "Cannon", "Cockpit", "Guillo", "Seginus", "Sandfeeder", "Hearteater", "Holoholobird", "Mange-Roches", "Holoholo Chick", "Lord of the Lava Caves", "Rudra", "Promachina Shanath", "Black Dragon", "Wiseman", "Baelheit", "Verus", "Machinanguis A", "Machinanguis B", "Verus-Wiseman", "Holoholo Egg", "Malpercio's Afterling 2 (head)", "Mr. Quintain", "nero_parts", "Machina Arma: Razer"}
     ReadOnly interrupted_battles() As Integer = {5, 29, 30, 42, 43, 62, 74, 93, 103, 108, 149, 151, 147, 135, 145, 252}
     ReadOnly HP_limit() As Integer = {1140 - 571, 2800 - 1401, 1760 - 177, 4560 - 2281, 4270 - 2136, 4000 - 201, 5280 - 397, 5080 - 509, 10320 - 4129, 8220 - 412, 6680 - 335, 9910 - 744, 11280 - 1129, 10690 - 1070, 13140 - 1315, 4270 - 2136}
     'Hideous Beast, Hideous Beast 2, Machina Arma: Razer, Umbra, Lord of the Lava Caves, Machina Arma: Marauder, Promachina Heughes, Machina Arma: Razer 2, Guillo, Promachina Shanath, Machina Arma: Marauder 2, Promachina Heughes 2, Machina Arma: Razer 3, Baelheit, Verus-Wiseman
@@ -44,7 +24,6 @@ Public Class Main
     Public ReadOnly element_color() As Color = {Color.FromArgb(&H90, &HA8, &H5A, &H2A), Color.FromArgb(&H90, &HFF, &H20, &H0), Color.FromArgb(&H90, &H0, &HB0, &HFF), Color.FromArgb(&H90, &H0, &HB0, &H0), Color.FromArgb(&H90, &HC0, &HC0, &HC0), Color.FromArgb(&H90, &HC0, &H0, &HFF)}
     Public ReadOnly status_color() As Color = {element_color(1), element_color(2), element_color(3), element_color(5)}
     Public ReadOnly bold As New Font("Segoe UI", 9, FontStyle.Bold)
-    ReadOnly dolphin_version() As String = {"Dolphin 4.0", "Dolphin 4.0.1", "Dolphin 4.0.2", "Dolphin 5.0"}
 
     Private Declare Function OpenProcess Lib "kernel32" (dwDesiredAccess As Integer, bInheritHandle As Integer, dwProcessId As Integer) As Integer
     Private Declare Function ReadProcessMemory Lib "kernel32" Alias "ReadProcessMemory" (hProcess As Integer, lpBaseAddress As Int64, ByRef lpBuffer As Integer, nSize As Integer, ByRef lpNumberOfBytesWritten As Integer) As Integer
@@ -64,6 +43,8 @@ Public Class Main
         KeyPreview = True
         BackColor = Color.DarkGray
         LoadWindowData()
+
+        Dim default_color As Color = Color.FromArgb(&H90, &HFF, &HFF, &HFF)
 
         context = New ContextMenuStrip()
         With context
@@ -89,6 +70,7 @@ Public Class Main
         End With
         Controls.Add(error_message)
 
+        Dim variable() As String = {"MP", "Enemy MP", "Partner MP", "EXP", "TP", "Gold"}
         For x = 0 To 11
             battle_data(x) = New Label()
             With battle_data(x)
@@ -157,6 +139,7 @@ Public Class Main
 
         empty = True
 
+        Dim column() As String = {"Character", "HP", "Delay", "Down", "Crush", "Poison", "Effect", "Aura"}
         For x = 0 To 7
             For y = 0 To 9
                 table(x, y) = New Label()
@@ -165,7 +148,6 @@ Public Class Main
                     If x = 0 Then
                         .Left = 40
                         .Size = New Size(169, 24)
-                        .Width = 169
                     Else
                         .Left = 127 + x * 83
                         .Size = New Size(82, 24)
@@ -285,6 +267,7 @@ Public Class Main
             If Not hooked Then
                 Dim title As String = emulator(0).MainWindowTitle
                 Dim version As Integer
+                Dim dolphin_version() As String = {"Dolphin 4.0", "Dolphin 4.0.1", "Dolphin 4.0.2", "Dolphin 5.0"}
                 For x = 0 To 3
                     If title = dolphin_version(x) OrElse title.StartsWith(dolphin_version(x) & " |") Then
                         version = x + 1
@@ -297,8 +280,8 @@ Public Class Main
                     Case 4
                         dolphin = -&H10000          '5.0
                     Case 0
-                        Dim secondary_window() As String = {"TAS Input", "Memory Card Manager", "Cheat Manager", "Cheats Manager"}
-                        For x = 0 To 3
+                        Dim secondary_window() As String = {"TAS Input", "Memory Card Manager", "Cheat Manager", "Cheats Manager", "Dolphin NetPlay Setup", "FIFO Player"}
+                        For x = 0 To secondary_window.Length - 1
                             If title.StartsWith(secondary_window(x)) Then
                                 error_message.Text = "Please close and reopen " & secondary_window(x) & " to proceed."
                                 Return
