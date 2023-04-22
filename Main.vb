@@ -292,7 +292,6 @@ Public Class Main
                 End Select
                 hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0, emulator(0).Id)
                 If hProcess = IntPtr.Zero Then
-                    CloseHandle(hProcess)
                     error_message.Text = "Failed to open Dolphin."
                     Return
                 End If
@@ -553,7 +552,12 @@ Public Class Main
             battle_data(0).Text = "MP"
             battle_data(6).Text = Decimals(MP, False)
         Else
-            Dim burst_timer As Integer = Read32(battle_address + &HA60)
+            Dim burst_timer As Integer
+            If game = &H474B344A Then
+                burst_timer = Read32(battle_address + &HA60)    'JP
+            Else
+                burst_timer = Read32(battle_address + &H3068)   'EN
+            End If
             battle_data(0).Text = "MP burst"
             battle_data(6).Text = FormatTime(burst_timer, 0)
         End If
