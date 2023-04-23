@@ -4,7 +4,6 @@
     Public legend(3, 18), table(19, 9, 2), dummy As Label
     Public address(19, 9, 2) As UInteger
     Dim context As ContextMenuStrip
-    Dim panel As CustomPanel
     Dim scroll_pos As Point
 
     Private Sub Open() Handles MyBase.Load
@@ -15,6 +14,7 @@
         Icon = New Icon(Me.GetType(), "icon.ico")
         MinimumSize = New Size(626, 243)
         MaximumSize = New Size(1381, 594)
+        AutoScroll = True
         DoubleBuffered = True
         KeyPreview = True
         BackColor = Color.DarkGray
@@ -33,11 +33,6 @@
             AddHandler .Opening, AddressOf OpenContextMenu
             AddHandler .ItemClicked, AddressOf CopyAddress
         End With
-
-        panel = New CustomPanel()
-        panel.Size = New Size(Width - 16, Height - 16)
-        panel.Dock = DockStyle.Fill
-        Controls.Add(panel)
 
         For x = 0 To 4
             legend(0, x) = New Label()
@@ -58,7 +53,7 @@
                 .Font = Main.bold
                 .Text = column_name(x)
             End With
-            panel.Controls.Add(legend(0, x))
+            Controls.Add(legend(0, x))
         Next
         For x = 0 To 17
             legend(1, x) = New Label()
@@ -83,7 +78,7 @@
                     End If
                 End If
             End With
-            panel.Controls.Add(legend(1, x))
+            Controls.Add(legend(1, x))
         Next
         For x = 0 To 8
             legend(2, x) = New Label()
@@ -94,7 +89,7 @@
                 .Location = New Point(20, 70 + x * 50)
                 .TextAlign = ContentAlignment.MiddleCenter
             End With
-            panel.Controls.Add(legend(2, x))
+            Controls.Add(legend(2, x))
         Next
 
         For x = 0 To 18
@@ -114,7 +109,7 @@
                         .Tag = Convert.ToChar(x) & y & z
                         .ContextMenuStrip = context
                     End With
-                    panel.Controls.Add(table(x, y, z))
+                    Controls.Add(table(x, y, z))
                 Next
             Next
         Next
@@ -124,11 +119,10 @@
             .Size = New Size(0, 0)
             .Location = New Point(1348, 0)
         End With
-        panel.Controls.Add(dummy)
+        Controls.Add(dummy)
 
         ContextMenuStrip = context
         Show()
-        panel.Focus()
     End Sub
 
     Private Sub LoadWindowData()
@@ -197,10 +191,10 @@
     End Sub
 
     Public Sub AdjustPositions()
-        If scroll_pos = panel.AutoScrollPosition Then
+        If scroll_pos = AutoScrollPosition Then
             Return
         End If
-        scroll_pos = panel.AutoScrollPosition
+        scroll_pos = AutoScrollPosition
         For x = 0 To 4
             Select Case x
                 Case 0
